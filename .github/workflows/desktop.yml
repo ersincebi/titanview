@@ -198,7 +198,12 @@ jobs:
           path: dist-desktop
           merge-multiple: true
       - name: latest.json
-        run: node scripts/updater-manifest.mjs dist-desktop "${GITHUB_REF_NAME}" "https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}" "TitanView ${GITHUB_REF_NAME}"
+        run: |
+          if ls dist-desktop/*.sig >/dev/null 2>&1; then
+            node scripts/updater-manifest.mjs dist-desktop "${GITHUB_REF_NAME}" "https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}" "TitanView ${GITHUB_REF_NAME}"
+          else
+            echo "::warning::TAURI_SIGNING_PRIVATE_KEY yok; imzalı updater paketi bulunmadığından latest.json atlandı"
+          fi
       - name: Sürüm (yoksa oluştur, varsa paketleri ekle)
         env:
           GH_TOKEN: ${{ github.token }}
