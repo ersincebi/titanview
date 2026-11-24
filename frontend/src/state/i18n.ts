@@ -315,7 +315,7 @@ export const MESSAGES: Record<string, { tr: string; en: string }> = {
   'drawer.alerts': { tr: 'Alarmlar', en: 'Alerts' },
   'drawer.news': { tr: 'Haberler & Gündem', en: 'News' },
   'drawer.datawindow': { tr: 'Veri Penceresi', en: 'Data Window' },
-  'drawer.hotlists': { tr: 'Sıcak Listeler', en: 'Hotlists' },
+  'drawer.hotlists': { tr: 'Sıcak Listeler', en: 'Top movers' },
   'drawer.calendar': { tr: 'Ekonomik Takvim', en: 'Calendar' },
   'drawer.notes': { tr: 'Notlar & Günlük', en: 'Notes & Journal' },
   'drawer.ideas': { tr: 'Notlar & Günlük', en: 'Notes & Journal' },

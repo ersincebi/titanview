@@ -410,6 +410,16 @@ describe('Faz 26 UI: Sembol ifadeleri, çoklu karşılaştır, kur dönüştürm
     fireEvent.click($('[data-modal-filter="INDEX"]'));
     expect($('[data-modal-sym="XU100.IS"]')).toBeTruthy();
 
+    // Aramadan favoriye ekle: modal kapanmaz, sembol değişmez, ★ olur ve listeye girer
+    const star = $('[data-search-fav="XU100.IS"]');
+    expect(star.textContent).toBe('☆');
+    fireEvent.click(star);
+    expect($('#titan-symbol-search-modal')).toBeTruthy();
+    expect($('[data-search-fav="XU100.IS"]').textContent).toBe('★');
+    expect(JSON.parse(localStorage.getItem('titanview_favorites_v1') ?? '[]').map((f: { symbol: string }) => f.symbol)).toContain('XU100.IS');
+    fireEvent.click($('[data-search-fav="XU100.IS"]'));
+    expect($('[data-search-fav="XU100.IS"]').textContent).toBe('☆');
+
     fireEvent.click($('[data-modal-filter="EXPR"]'));
     expect($('[data-preset-expr="BTCUSDT/ETHUSDT"]')).toBeTruthy();
 

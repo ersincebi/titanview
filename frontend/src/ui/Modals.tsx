@@ -33,6 +33,8 @@ import {
   toggleSimpleMode,
   ui,
   undoAction,
+  favorites,
+  toggleFav,
 } from '../state/store';
 import {
   PRESET_EXPRESSIONS,
@@ -42,6 +44,7 @@ import {
 } from '../state/symbolExpr';
 import { TEMPLATES } from '../state/templates';
 import { toggleTheme } from '../state/theme';
+import { isFavorite } from '../state/favorites';
 import { filterWatchlistSymbols, type MarketFilter } from '../state/watchlist';
 import type { CompareScale } from '../chart/panes';
 import type { SymbolQuoteSummary } from '../types/market';
@@ -491,6 +494,20 @@ function SymbolSearchModal(): JSX.Element {
                       </div>
                     </div>
                     <div style={{ display: 'flex', 'align-items': 'center', gap: '12px' }}>
+                      <button
+                        type="button"
+                        class="sym-fav-btn"
+                        classList={{ on: isFavorite(favorites(), item.symbol) }}
+                        data-search-fav={item.symbol}
+                        title={isFavorite(favorites(), item.symbol) ? tt('Favorilerden çıkar') : tt('Favorilere ekle')}
+                        aria-pressed={isFavorite(favorites(), item.symbol)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleFav({ symbol: item.symbol, displayName: item.displayName, market: item.market });
+                        }}
+                      >
+                        {isFavorite(favorites(), item.symbol) ? '★' : '☆'}
+                      </button>
                       <div style={{ 'text-align': 'right', 'font-family': 'var(--font-mono)', 'font-size': '12px' }}>
                         <div style={{ 'font-weight': '600', color: 'var(--text-strong)' }}>{item.lastPrice == null ? '—' : `${item.lastPrice.toFixed(2)} ${item.currency}`}</div>
                         <div style={{ 'font-size': '11px', 'font-weight': '700', color: item.changePercent == null ? 'var(--text-secondary)' : item.changePercent >= 0 ? 'var(--bull)' : 'var(--bear)' }}>

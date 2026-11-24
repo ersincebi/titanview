@@ -74,3 +74,13 @@ describe('Faz 20: hazır gösterge kütüphanesi', () => {
     }
   });
 });
+
+describe('legacy builtin ids', () => {
+  it('maps pre-1.0 ids of renamed files to the new ids', async () => {
+    const { builtinById } = await import('../builtins');
+    expect(builtinById('rb_knoxville')?.id).toBe('mom_rsi_divergence');
+    expect(builtinById('rb_ziv_ghost')?.id).toBe('weekly_mid_pivots');
+    expect(builtinById('weekly_mid_pivots')?.title).toBe('Weekly Midpoint Pivots');
+    expect(builtinById('nope')).toBeUndefined();
+  });
+});

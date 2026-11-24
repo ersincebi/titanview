@@ -1,6 +1,6 @@
 [package]
 name = "titanview-desktop"
-version = "1.0.0"
+version = "1.0.1"
 license = "AGPL-3.0-or-later"
 description = "TitanView shell (Tauri v2): desktop with Go sidecar, Android with in-process Go core"
 edition = "2021"

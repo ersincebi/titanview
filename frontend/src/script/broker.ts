@@ -45,7 +45,7 @@ export interface SubBar {
 
 /**
  * Bar içi fiyat yolu. Alt bar yoksa Standart sezgisi (açılışa yakın uç önce); varsa her alt barın kendi
- * O-H-L-C yolu sırayla izlenir ("Bar Magnifier").
+ * O-H-L-C yolu sırayla izlenir (mum içi dolum).
  */
 export function intrabarPath(bar: SubBar, subBars?: SubBar[]): number[] {
   if (!subBars || subBars.length === 0) {

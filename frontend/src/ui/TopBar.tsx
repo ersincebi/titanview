@@ -18,6 +18,8 @@ import {
   activeChartInterval,
   activeChartSymbol,
   addCustomTimeframe,
+  favorites,
+  toggleFavSymbol,
   openQuickSearch,
   redoAction,
   removeCustomTimeframe,
@@ -35,6 +37,7 @@ import {
 import { theme, toggleTheme } from '../state/theme';
 import { ICONS } from '../styles/icons';
 import type { ChartStyleMode, Timeframe } from '../types/market';
+import { isFavorite } from '../state/favorites';
 import { Icon } from './Icon';
 import { FavoriteIndicatorsMenu } from './Indicators';
 import { setSettingsTab } from './Modals';
@@ -133,6 +136,16 @@ export function TopBar(): JSX.Element {
           onClick={() => openQuickSearch('symbol')}
         >
           <span id="lbl-top-symbol">{activeChartSymbol().replace(/\.IS$/, '')}</span>
+        </button>
+        <button
+          id="btn-top-symbol-fav"
+          class="tv-btn sym-fav-btn"
+          classList={{ on: isFavorite(favorites(), activeChartSymbol()) }}
+          aria-pressed={isFavorite(favorites(), activeChartSymbol())}
+          title={isFavorite(favorites(), activeChartSymbol()) ? tt('Favorilerden çıkar') : tt('Favorilere ekle')}
+          onClick={() => toggleFavSymbol(activeChartSymbol())}
+        >
+          {isFavorite(favorites(), activeChartSymbol()) ? '★' : '☆'}
         </button>
 
         <button

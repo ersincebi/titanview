@@ -31,6 +31,7 @@ const ALLOWED = new Set([
   'AGPL-3.0-or-later',
   'Unicode-3.0',
   'CDLA-Permissive-2.0',
+  'OFL-1.1', // gömülü yazı tipleri (Inter, JetBrains Mono)
   'LicenseRef-MIT-Lucent', // goja/ftoa permissive Lucent/MIT notice
 ]);
 

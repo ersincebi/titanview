@@ -18,6 +18,8 @@ This product includes software developed by third parties:
   Copyright (c) Ryan Carniato — MIT License.
 - Tauri (https://tauri.app)
   Copyright (c) The Tauri Programme within The Commons Conservancy — MIT / Apache-2.0.
+- Inter (https://rsms.me/inter) and JetBrains Mono (https://www.jetbrains.com/lp/mono/) fonts,
+  bundled via Fontsource — SIL Open Font License 1.1.
 - Goja (https://github.com/dop251/goja) — MIT License.
 - Gorilla WebSocket (https://github.com/gorilla/websocket) — BSD-2-Clause License.
 - go-sqlite3 (https://github.com/mattn/go-sqlite3) — MIT License.

@@ -145,7 +145,7 @@ export function FxModal(): JSX.Element {
       title={
         parentLabel()
           ? en() ? `Indicator on indicator: ${parentLabel()}` : `Gösterge üstüne gösterge: ${parentLabel()}`
-          : en() ? 'Indicators, metrics, and strategies' : 'Göstergeler, metrikler ve stratejiler'
+          : en() ? 'Add a study' : 'Çalışma ekle'
       }
       onClose={closeFx}
     >

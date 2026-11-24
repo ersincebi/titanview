@@ -74,7 +74,7 @@ import { getChartBySlot, getOverlayBySlot, rt } from './runtime';
 import { DEFAULT_INDICATORS, TEMPLATES, type TemplateKey, templateFlags } from './templates';
 import { candleChangePct } from './reports';
 import { applyQuote, type MarketFilter, type WatchlistTab } from './watchlist';
-import { loadFavorites, mergeFavorites, saveFavorites, toggleFavorite, type Favorite } from './favorites';
+import { favoriteFor, loadFavorites, mergeFavorites, saveFavorites, toggleFavorite, type Favorite } from './favorites';
 import { isMobileWidth } from './mobile';
 import {
   DEFAULT_SECONDARY,
@@ -2784,6 +2784,12 @@ export function toggleFav(item: Favorite): void {
   saveFavorites(next);
   void syncFavoritesToServer();
   void refreshQuotes();
+}
+
+/** Yalnız sembol adıyla favori aç/kapat (üst çubuk ☆, arama, komutlar). */
+export function toggleFavSymbol(symbol: string): void {
+  if (!symbol.trim()) return;
+  toggleFav(favoriteFor(symbol, symbols()));
 }
 
 /**

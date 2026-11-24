@@ -109,8 +109,17 @@ function build(): BuiltinIndicator[] {
 export const BUILTINS: BuiltinIndicator[] = build();
 const BY_ID = new Map(BUILTINS.map((b) => [b.id, b]));
 
+/** v1.0.0 öncesi kayıtlı çalışma alanlarındaki eski kimlikler. */
+const LEGACY_IDS: Record<string, string> = {
+  rb_intraday_pivots: 'day_floor_pivots',
+  rb_knoxville: 'mom_rsi_divergence',
+  rb_missed_pivots: 'untouched_daily_pivots',
+  rb_reversal: 'macd_stoch_reversal',
+  rb_ziv_ghost: 'weekly_mid_pivots',
+};
+
 export function builtinById(id: string): BuiltinIndicator | undefined {
-  return BY_ID.get(id);
+  return BY_ID.get(id) ?? BY_ID.get(LEGACY_IDS[id] ?? '');
 }
 
 const fold = (s: string) =>

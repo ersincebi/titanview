@@ -2668,8 +2668,9 @@ html[data-theme='light'] .symbol-trigger-btn, html[data-theme='light'] .btn-trad
 .wl-row { height: 31px; padding: 0 10px; font-size: 14px; color: var(--text-primary); }
 .wl-row.active { background: #1a2340; box-shadow: none; }
 .wl-row .wl-sym-code { font-size: 14px; font-weight: 400; color: var(--text-primary); }
-.wl-star { opacity: 0; font-size: 12px; }
+.wl-star { opacity: 0.35; font-size: 12px; }
 .wl-row:hover .wl-star, .wl-star.on { opacity: 1; }
+@media (hover: none) { .wl-star { opacity: 0.8; } }
 .wl-c { font-family: var(--font-sans); font-size: 14px; }
 .wl-c.wl-price { font-weight: 400; color: var(--text-primary); }
 .wl-c.wl-chgabs, .wl-c.wl-chg { font-weight: 400; font-size: 14px; }
@@ -5053,3 +5054,8 @@ tr.trade-row-selected td { background: rgba(124, 157, 255, 0.18); }
   font-size: 12px;
 }
 
+
+/* Sembol favorisi: üst çubuk ve sembol arama satırları */
+.sym-fav-btn { background: none; border: none; cursor: pointer; color: var(--text-secondary); font-size: 16px; line-height: 1; padding: 4px 6px; border-radius: 4px; }
+.sym-fav-btn:hover { color: #ffc107; background: var(--bg-hover); }
+.sym-fav-btn.on { color: #ffc107; }
