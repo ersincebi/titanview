@@ -45,8 +45,8 @@ pnpm tauri dev              # geliştirme
 
 ## CI (`.github/workflows/desktop.yml`)
 
-Matris: `macos-latest` (aarch64 + x86_64), `windows-latest`, `ubuntu-22.04`. Faz 32 tamamlanana kadar yalnızca elle
-(`gh workflow run desktop.yml`) koşar; `v*` etiketi itildiğinde taslak sürüm + `latest.json` üretir.
+Matris: `macos-latest` (aarch64 + x86_64), `windows-latest`, `ubuntu-22.04`. `v*` etiketi itildiğinde, sürüm
+yayınlandığında veya elle (`gh workflow run desktop.yml`) koşar; sürüm paketleri ile `latest.json` dosyasını üretir.
 
 ## İmza, notarization ve güncelleme sırları
 

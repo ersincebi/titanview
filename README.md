@@ -1,17 +1,29 @@
 <div align="center">
 
+<img src="public/icons/logo.svg" alt="TitanView Logo" width="76" height="76" />
+
 # TitanView
 
-**An open-source, local-first charting and analysis terminal with the TitanScript (`.titan`) engine,
+**An open-source, local-first charting and market analysis terminal with the TitanScript (`.titan`) engine,
 a strategy tester, server-side alerts, and paper trading.**
 
-Desktop (macOS · Windows · Linux) and browser · Your data stays on your machine · AGPL-3.0-or-later
+Desktop (macOS · Windows · Linux) · Android · Browser · Your data stays on your machine
 
-[Download](https://github.com/ersincebi/titanview/releases) ·
+[![CI](https://github.com/ersincebi/titanview/actions/workflows/ci.yml/badge.svg)](https://github.com/ersincebi/titanview/actions/workflows/ci.yml)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3%2B-0284C7.svg)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/ersincebi/titanview?include_prereleases&color=089981)](https://github.com/ersincebi/titanview/releases)
+[![Platforms](https://img.shields.io/badge/Platforms-macOS%20%7C%20Windows%20%7C%20Linux%20%7C%20Android%20%7C%20Web-334155.svg)](#download--install)
+
+[Download](https://github.com/ersincebi/titanview/releases/latest) ·
+[Screenshots](#screenshots) ·
+[Documentation](#documentation) ·
 [Build from source](#build-from-source) ·
 [Contributing](CONTRIBUTING.md) ·
-[Roadmap](#roadmap) ·
 [Türkçe](#türkçe)
+
+<br />
+
+<img src="docs/screenshots/hero-chart.png" alt="TitanView Terminal — Live BTCUSDT chart, Volume Profile, EMA Strategy, Strategy Tester, and Watchlist" width="100%" />
 
 </div>
 
@@ -26,55 +38,100 @@ Charting platforms keep moving core features behind paywalls: indicator limits, 
 Renko/Kagi, footprint charts, and multi-chart layouts. TitanView is a complete, self-hosted alternative
 that anyone can run, inspect, and improve:
 
-- **Local-first.** A Go server with an SQLite cache runs next to the UI. No account, no cloud, no tracking.
-- **Ergonomic.** Keyboard-driven workspace, fast shortcuts, and multi-pane layouts designed for active chart analysis.
-- **Programmable.** Real bar-by-bar **TitanScript** (`.titan`) runtime supporting `//@version=5/6`, `indicator()`, `strategy()`, and `library()`. Compatible scripts from other charting platforms run with little or no modification.
-- **Hackable.** TypeScript + SolidJS front end, Go back end, Rust/WASM hot core, Tauri v2 desktop shell. All tested.
+- **Local-first.** A Go server with an SQLite WAL cache runs next to the UI. No account, no cloud, no tracking.
+- **Ergonomic.** Keyboard-driven workspace, fast shortcuts, 42 multi-chart layouts (up to 16 panes), dark & light themes, English & Turkish UI.
+- **Programmable.** Real bar-by-bar **TitanScript** (`.titan`) runtime supporting `//@version=5/6`, `indicator()`, `strategy()`, and `library()`, accelerated with Rust/WASM. Compatible scripts from other charting platforms run with little or no modification.
+- **Privacy & compliance first.** Official public APIs (Binance, Deribit, central-bank calendars) work out of the box; unofficial third-party endpoints are **off by default** behind an explicit opt-in consent gate.
+- **Hackable.** TypeScript + SolidJS front end, Go back end, Rust/WASM hot core, Tauri v2 desktop & Android shell. All tested (`go test -race`, 1,100+ UI/engine tests, smoke suite, license & secret CI gates).
+
+---
+
+## Screenshots
+
+<table>
+  <tr>
+    <td width="50%">
+      <strong>TitanScript Monaco Editor & Live Strategy Summary</strong><br />
+      <img src="docs/screenshots/script-editor.png" alt="TitanScript Monaco Editor and Backtest Summary" />
+    </td>
+    <td width="50%">
+      <strong>2×2 Multi-Chart Sync Layout (Up to 16 Charts)</strong><br />
+      <img src="docs/screenshots/multichart-2x2.png" alt="2x2 Multi-Chart Live Crypto Layout" />
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <strong>194 Clean-Room Built-In Indicators & Light Theme</strong><br />
+      <img src="docs/screenshots/indicators-light.png" alt="194 Built-in Indicators Library in Light Theme" />
+    </td>
+    <td width="50%" align="center">
+      <strong>Mobile & Android Responsive View</strong><br />
+      <img src="docs/screenshots/mobile-view.png" alt="TitanView Mobile Responsive Chart" height="340" />
+    </td>
+  </tr>
+</table>
+
+---
 
 ## Features
 
 | Area | What you get |
 |---|---|
-| **Charts** | 21 chart types: bars, candles, hollow and volume candles, line/step/area/HLC area/baseline, columns, high-low, Heikin Ashi, Renko, line break, Kagi, Point & Figure, range, **volume footprint** (real order flow for crypto), **TPO**, **session volume profile** |
-| **TitanScript engine** | Bar-by-bar `.titan` runtime: `var`/`varip`, UDTs, methods, enums, `map`, `matrix`, libraries (`import`/`export`), `request.security` without repainting, drawings (lines, boxes, labels, tables, polylines, linefills), `log.*` console; compatible syntax with scripts from other charting platforms |
-| **Script editor** | Monaco-based TitanScript editor with syntax highlighting, completion, signature help, hover docs, error markers, script library, and version history |
-| **Indicators** | 194 built-in clean-room indicators written in TitanScript (`.titan`), 45 candlestick patterns, auto Fib/pivots/trendlines, indicator-on-indicator, visible/fixed/session volume profiles |
-| **Drawing tools** | Lines, channels, pitchforks, the full Fibonacci and Gann families, shapes, XABCD/harmonic patterns, Elliott waves, forecasting and measuring tools, notes, icons, templates, magnet modes |
-| **Strategy tester** | Realistic bar-by-bar broker emulation, deep backtest over full history, bar magnifier, trade list linked to the chart, CSV/XLSX export, parameter optimisation (grid search, WASM workers) |
-| **Alerts** | Server-side engine that keeps running when the UI is closed: price, indicator, strategy, and drawing conditions; once / once per bar / on bar close; webhook, Telegram, and Web Push |
-| **Layouts** | Up to 16 charts per layout with symbol, interval, crosshair, time, and drawing sync; saved layouts; custom intervals |
-| **Symbols & data** | Symbol expressions (`BTCUSDT/ETHUSDT`, spreads, baskets), currency conversion, dividends/splits/earnings on chart, fundamentals, calendars, crypto options (Deribit) |
-| **Watchlists & screeners** | Multiple and flagged watchlists, custom columns, import/export, advanced screener, and TitanScript screener |
-| **Trading** | Paper trading with every order type and draggable orders/TP/SL on the chart; opt-in live orders on Binance (your own keys, encrypted locally, confirmation on every order) |
-| **Extras** | Command-bar terminal (`DES`, `GP`, `FA`, `OVME`), market heatmap, correlation matrix, multi-factor analysis panel, whale tape, offline mode, English and Turkish UI |
+| **Charts** | 21 chart types: bars, candles, hollow & volume candles, line/step/area/HLC area/baseline, columns, high-low, Heikin Ashi, Renko, line break, Kagi, Point & Figure, range, **volume footprint** (real order flow for crypto), **TPO**, **session & visible volume profile** |
+| **TitanScript engine** | Bar-by-bar `.titan` runtime: `var`/`varip`, UDTs, methods, enums, `map`, `matrix`, libraries (`import`/`export`), non-repainting `request.security`, drawings (`line`, `box`, `label`, `table`, `polyline`, `linefill`), `log.*` console; compatible syntax with scripts from other platforms |
+| **Script editor** | Monaco-based TitanScript editor with syntax highlighting, autocomplete, signature help, hover docs, error markers, script library, and version history |
+| **Indicators** | **194 clean-room built-in indicators** written in TitanScript (`.titan`), 45 candlestick patterns, auto Fib/pivots/trendlines, indicator-on-indicator, visible/fixed/session volume profiles |
+| **Drawing tools** | Lines, channels, pitchforks, full Fibonacci & Gann families, shapes, XABCD/harmonic patterns, Elliott waves, forecasting & measuring tools, notes, icons, templates, magnet modes |
+| **Strategy tester** | Realistic bar-by-bar broker emulation, deep backtest over full history, bar magnifier, trade list linked to chart, CSV/XLSX export, parameter optimization (grid search on parallel WASM workers) |
+| **Alerts** | Server-side engine that keeps running when the UI is closed: price, indicator, strategy, and drawing conditions; webhook, Telegram, ntfy push, and Web Push |
+| **Layouts** | 42 layouts (1–16 charts) with symbol, interval, crosshair, time, and drawing sync; saved & shareable read-only layouts; custom intervals (including seconds for crypto) |
+| **Symbols & data** | Symbol expressions (`BTCUSDT/ETHUSDT`, spreads, baskets), currency conversion, dividends/splits/earnings on chart, fundamentals, official economic calendars, crypto options (Deribit) |
+| **Watchlists & screeners** | Multiple & 7-color flagged watchlists, custom columns, import/export, advanced screener, and **TitanScript screener** |
+| **Trading** | Paper trading with all order types and draggable orders/TP/SL on chart; opt-in live orders on Binance (your own keys, encrypted locally, explicit confirmation per order) |
+| **Extras** | Command bar (`DES`, `GP`, `FA`, `OVME`), market heatmap, correlation matrix, multi-factor analysis panel, whale tape, offline mode, English & Turkish UI |
 
-## Install
+---
 
-Download the package for your platform from **[Releases](https://github.com/ersincebi/titanview/releases)**.
+## Download & Install
 
-| Platform | Package |
-|---|---|
-| macOS (Apple Silicon and Intel) | `.dmg` |
-| Windows 10/11 | `.exe` installer or `.msi` |
-| Linux | `.AppImage`, `.deb`, `.rpm` |
-| Android 7+ | `.apk` (install from the release page; allow "install unknown apps" for your browser) |
+Grab the package for your platform from **[GitHub Releases](https://github.com/ersincebi/titanview/releases/latest)**:
 
-The Android app runs the whole engine on the phone, or connects to your own TitanView server
-(`titanview-server -remote`, see [docs/mobile.md](docs/mobile.md)). It is not published on app stores.
+| Platform | Package | Install notes |
+|---|---|---|
+| **macOS** (Apple Silicon & Intel) | `.dmg` | Drag to Applications, or install via Homebrew below |
+| **Windows 10/11** | `.exe` installer or `.msi` | Per-user NSIS / WiX installer |
+| **Linux** | `.AppImage`, `.deb`, `.rpm` | Standalone AppImage or system package |
+| **Android 7+** | `.apk` | Download from Releases; allows local in-process core or remote server ([docs/mobile.md](docs/mobile.md)) |
+| **Self-hosted Web** | Docker Compose | `docker compose up -d --build` (listens on `127.0.0.1:8098`) |
 
-**macOS with Homebrew** (from the first signed release):
+**macOS with Homebrew:**
 
 ```bash
 brew tap ersincebi/titanview https://github.com/ersincebi/titanview
 brew install --cask titanview
 ```
 
-> Release builds are not yet signed with Apple or Microsoft certificates. macOS Gatekeeper and Windows
-> SmartScreen may show a warning on first launch. Signing is on the [roadmap](#roadmap).
+> Release builds are not yet signed with paid Apple Developer or Windows Authenticode certificates.
+> macOS Gatekeeper and Windows SmartScreen may show a first-launch warning. Code signing is on the [roadmap](#roadmap).
+
+---
+
+## Documentation
+
+| Guide | Topics |
+|---|---|
+| **[Getting Started](docs/getting-started.md)** | Installation, official vs. opt-in data sources, remote server pairing, shortcuts, paper/live trading |
+| **[TitanScript Guide](docs/titanscript.md)** | `.titan` language features, `ta.*`, strategy backtesting, examples, adding clean-room indicators |
+| **[Architecture & Security](docs/architecture.md)** | System diagram, package map, SQLite WAL cache, token auth, transport opt-in gate, CI compliance |
+| **[Desktop App](docs/desktop.md)** | Tauri v2 sidecar architecture, data directories, tray menu, auto-updater, building desktop bundles |
+| **[Android App](docs/mobile.md)** | Local in-process Go core (`libtitan.so`), `-remote` server pairing, `ntfy` phone push notifications |
+| **[Contributing](CONTRIBUTING.md)** & **[Security](SECURITY.md)** | Clean-room rules, DCO sign-off, test commands, vulnerability reporting |
+
+---
 
 ## Build from source
 
-**Requirements:** Node.js 20+ and pnpm 10, Go 1.26+, Rust stable (for the WASM core and the desktop shell).
+**Requirements:** Node.js 20+ and pnpm 10, Go 1.26+, Rust stable (for the WASM core and Tauri shell).
 
 ```bash
 git clone https://github.com/ersincebi/titanview.git
@@ -97,52 +154,28 @@ node scripts/android-init.mjs
 pnpm tauri android build --apk
 ```
 
-Run every check that CI runs: `make verify` (Go tests with `-race`, typecheck, frontend tests, build, smoke test).
+Run the full local verification suite:
 
-## Architecture
-
-```
-┌────────────────────────────── Desktop shell (Tauri v2, Rust) ──────────────────────────────┐
-│  tray · notifications · global shortcuts · auto-update · starts/stops the Go sidecar       │
-│ ┌──────────────── UI (SolidJS + TypeScript) ────────────────┐   ┌──── Go server ─────────┐ │
-│ │ chart/   lightweight-charts v5, custom series, primitives │   │ api/       REST + WS   │ │
-│ │ script/  TitanScript: lexer → parser → typecheck → VM     │◄─►│ provider/  Binance,    │ │
-│ │          (Web Worker; hot paths in Rust/WASM: wasm/)      │   │            Yahoo, …    │ │
-│ │ state/   stores, workspace, layouts                       │   │ storage/   SQLite      │ │
-│ │ ui/      shell, panels, modals, editor (Monaco)           │   │ alerts/    alert engine│ │
-│ └───────────────────────────────────────────────────────────┘   │ scriptjs/  server VM   │ │
-│                                                                  │ trading/   paper+live  │ │
-│                                                                  │ footprint/ order flow  │ │
-│                                                                  └────────────────────────┘ │
-└──────────────────────────────────────────────────────────────────────────────────────────────┘
+```bash
+make verify                                          # Go -race, typecheck, frontend tests, build, smoke
+node scripts/check-licenses.mjs --require-go --require-rust  # License & clean-room audit
 ```
 
-| Path | Contents |
-|---|---|
-| `frontend/src/chart` | Chart controller, panes, custom series (Kagi, P&F, footprint…), drawing tools |
-| `frontend/src/script` | TitanScript language: lexer, parser, type checker, VM, `ta.*`, broker emulation, editor, built-ins (`builtins/*.titan`) |
-| `frontend/src/state`, `frontend/src/ui` | Application state and SolidJS components |
-| `backend/internal` | Go packages: `api`, `provider`, `storage`, `alerts`, `scriptjs`, `trading`, `footprint`, `analytics`, `hub`, … |
-| `wasm/titan-core` | Rust core compiled to WASM for the strategy optimiser and heavy indicator paths |
-| `src-tauri` | Desktop and Android shell (Tauri v2) |
-| `backend/mobile`, `backend/cmd/libtitan` | Go server as an in-process library for the Android app |
+---
 
 ## Roadmap
 
 | Status | Item |
 |---|---|
-| ✅ | Charts, TitanScript engine and editor, 194 built-in indicators, drawing tools, strategy tester, alerts, layouts, watchlists, paper trading |
-| ✅ | Desktop packages for every platform (Tauri), signed auto-update |
-| ✅ | Android app (local engine or remote server), phone push via ntfy |
-| 📋 | Data providers as plugins, signed macOS/Windows builds, more languages |
+| ✅ | Charts, TitanScript engine & editor, 194 clean-room indicators, drawing tools, strategy tester, alerts, layouts, watchlists, paper trading |
+| ✅ | Desktop packages for macOS / Windows / Linux (Tauri v2), Homebrew cask, signed auto-updater manifest |
+| ✅ | Android app (local in-process Go core or remote server), phone push via `ntfy` |
+| ✅ | Opt-in gate for unofficial data sources, automated cross-ecosystem license & `gitleaks` CI compliance |
+| 📋 | Pluggable market-data provider SDK, notarized macOS & Authenticode Windows builds, additional UI languages |
 
-Ideas and help are welcome: see [good first issues](https://github.com/ersincebi/titanview/labels/good%20first%20issue) and [CONTRIBUTING.md](CONTRIBUTING.md).
+Ideas, bug reports, and PRs are welcome! Browse [good first issues](https://github.com/ersincebi/titanview/labels/good%20first%20issue), join [Discussions](https://github.com/ersincebi/titanview/discussions), or read [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## Contributing
-
-Bug reports, script compatibility test cases, new indicators, drawing tools, data providers,
-translations, and documentation are all welcome. Start with [CONTRIBUTING.md](CONTRIBUTING.md).
-By participating you agree to the [Code of Conduct](CODE_OF_CONDUCT.md). Security issues: [SECURITY.md](SECURITY.md).
+---
 
 ## Disclaimer
 
@@ -151,7 +184,7 @@ By participating you agree to the [Code of Conduct](CODE_OF_CONDUCT.md). Securit
 - **Market data.** TitanView does not provide or redistribute market data. It connects directly from your machine:
   - **Official public APIs (enabled by default):** Binance (spot candles, live WebSocket, order-flow footprint), Deribit (crypto options), and official statistical/central-bank calendars (TCMB, TÜİK, Fed, BLS, ECB, BEA, SPK).
   - **Unofficial endpoints (disabled by default — opt-in):** Yahoo Finance, Google News, and İş Yatırım (used for BIST/US equities, FX conversion, fundamentals, corporate events, and news) are **OFF by default** and no requests are sent to them until you explicitly review and accept responsibility for third-party terms of use in **Settings → Data sources** (or set `TITAN_UNOFFICIAL_SOURCES=1` / `-unofficial-sources` on headless servers). BIST data is ~15 minutes delayed.
-- **Live orders** are opt-in, use your own API keys, and need explicit confirmation for each order. Use at your own risk.
+- **Live orders** are opt-in, use your own API keys, and require explicit confirmation for each order. Use at your own risk.
 - The software is provided "as is", without warranty of any kind (AGPL-3.0, sections 15 and 16).
 
 ## License
@@ -168,18 +201,16 @@ TitanView; **TitanScript** (`.titan`) betik motoru, strateji test cihazı, sunuc
 paper trading'i olan **açık kaynak, yerel öncelikli** bir grafik ve analiz terminalidir. Masaüstünde
 (macOS / Windows / Linux), Android'de ya da tarayıcıda çalışır; veriler senin bilgisayarında, SQLite'ta durur.
 
+- **İndir ve Kur:** [Releases](https://github.com/ersincebi/titanview/releases/latest) sayfasından platformuna uygun paketi indir
+  (`.dmg`, `.exe` / `.msi`, `.AppImage` / `.deb` / `.rpm`, Android için `.apk`). macOS'ta Homebrew ile: `brew tap ersincebi/titanview https://github.com/ersincebi/titanview && brew install --cask titanview`.
+- **Dokümantasyon:** [Başlangıç Rehberi](docs/getting-started.md) · [TitanScript Rehberi](docs/titanscript.md) · [Mimari](docs/architecture.md) · [Masaüstü](docs/desktop.md) · [Android](docs/mobile.md).
 - **Betik uyumluluğu:** Başka platformlardan gelen uyumlu söz dizimindeki betikler (`//@version=5/6`, `indicator()`, `strategy()`, `library()`) az değişiklikle ya da hiç değişiklik yapmadan çalışır.
-- **Kurulum:** [Releases](https://github.com/ersincebi/titanview/releases) sayfasından platformuna uygun paketi indir
-  (`.dmg`, `.exe` / `.msi`, `.AppImage` / `.deb` / `.rpm`, Android için `.apk`). macOS'ta Homebrew komutları yukarıda.
-  Android uygulaması mağazada değildir; APK sürüm sayfasından kurulur. Telefon motoru kendisi çalıştırır ya da
-  kendi sunucuna (`titanview-server -remote`) bağlanır: [docs/mobile.md](docs/mobile.md).
-- **Katkı:** Hata bildirimi, betik uyumluluk testleri, yeni gösterge/çizim aracı, veri
-  sağlayıcısı ve çeviri katkılarına açığız. Başlangıç: [CONTRIBUTING.md](CONTRIBUTING.md) (Türkçe bölümü de var).
-- **Bağımsızlık bildirimi:** TitanView'ın TradingView ile bağlantısı yoktur. TradingView® ve Pine Script®, TradingView, Inc.'in tescilli markalarıdır; bkz. [NOTICE](NOTICE).
-- **Yatırım tavsiyesi değildir.** Gösterilen sinyal, analiz ve backtest sonuçları yatırım tavsiyesi değildir.
 - **Veri:** TitanView veri dağıtmaz; üçüncü tarafların uç noktalarına senin bilgisayarından bağlanır.
   Resmî açık API'ler (Binance, Deribit, TCMB/TÜİK/Fed/BLS/ECB takvimleri) varsayılan açıktır. Resmî olmayan
   üçüncü taraf uç noktaları (Yahoo Finance, Google News, İş Yatırım — BIST/ABD hisseleri, kurlar, temel veriler,
   haberler) **varsayılan olarak kapalıdır**; **Ayarlar → Veri Kaynakları** üzerinden kullanım şartları
   sorumluluğunu onaylayarak (veya sunucuda `TITAN_UNOFFICIAL_SOURCES=1` ile) açılabilir. BIST verisi ~15 dk gecikmelidir.
+- **Katkı ve Tartışma:** [CONTRIBUTING.md](CONTRIBUTING.md), [good first issues](https://github.com/ersincebi/titanview/labels/good%20first%20issue) ve [Discussions](https://github.com/ersincebi/titanview/discussions).
+- **Bağımsızlık bildirimi:** TitanView'ın TradingView ile bağlantısı yoktur. TradingView® ve Pine Script®, TradingView, Inc.'in tescilli markalarıdır; bkz. [NOTICE](NOTICE).
+- **Yatırım tavsiyesi değildir.** Gösterilen sinyal, analiz ve backtest sonuçları yatırım tavsiyesi değildir.
 - **Lisans:** AGPL-3.0 veya sonrası.
