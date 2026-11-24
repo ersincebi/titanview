@@ -6,10 +6,10 @@
 #   APPLE_ID, APPLE_PASSWORD, APPLE_TEAM_ID                        → macOS notarization
 #   WINDOWS_CERTIFICATE (pfx, base64), WINDOWS_CERTIFICATE_PASSWORD → Windows Authenticode
 name: desktop
-# Runs on version tags (v*), published releases, or manual workflow_dispatch.
+# Runs when a release is published (its tag is created with it) or by manual workflow_dispatch.
+# A separate tag-push trigger started a second run in the same concurrency group, which cancelled
+# the queued macOS arm64 job of the release run.
 on:
-  push:
-    tags: ['v*']
   release:
     types: [published]
   workflow_dispatch:
