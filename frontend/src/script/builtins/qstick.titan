@@ -1,0 +1,10 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr QStick
+// @category osc
+// @desc Mum gövdelerinin ortalaması
+indicator("QStick", "QStick", overlay=false)
+length = input.int(14, "Length", minval=1)
+q = ta.sma(close - open, length)
+plot(q, "QStick", color=q >= 0 ? #089981 : #F23645, style=plot.style_columns)
+hline(0, "Zero", color=#787B86)

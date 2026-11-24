@@ -1,0 +1,16 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Üç Kara Karga
+// @category pattern
+// @desc Mum formasyonu — ayı (düşüş) sinyali (3BC)
+indicator("Three Black Crows", "3BC", overlay=true)
+bodyTop = math.max(open, close)
+bodyBot = math.min(open, close)
+bodySize = bodyTop - bodyBot
+barRange = high - low
+lowerWick = bodyBot - low
+avgBody = ta.ema(bodySize, 14)
+isLong = bodySize > avgBody
+isBear = close < open
+detected = isBear and isBear[1] and isBear[2] and isLong and isLong[1] and isLong[2] and close < close[1] and close[1] < close[2] and open < open[1] and open > close[1] and open[1] < open[2] and open[1] > close[2] and lowerWick <= barRange * 0.25 and lowerWick[1] <= barRange[1] * 0.25 and lowerWick[2] <= barRange[2] * 0.25
+plotshape(detected, "Three Black Crows", style=shape.labeldown, location=location.abovebar, color=color.new(#F23645, 0), text="3BC", textcolor=color.white, size=size.small)

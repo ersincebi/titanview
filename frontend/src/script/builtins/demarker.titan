@@ -1,0 +1,13 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr DeMarker
+// @category osc
+// @desc Tepe/dip genişlemesi oranı (0–1)
+indicator("DeMarker", "DeM", overlay=false, format=format.price, precision=4)
+length = input.int(14, "Length", minval=1)
+demax = high > high[1] ? high - high[1] : 0
+demin = low < low[1] ? low[1] - low : 0
+dem = ta.sma(demax, length) / (ta.sma(demax, length) + ta.sma(demin, length))
+plot(dem, "DeMarker", color=#0284C7)
+hline(0.7, "Upper", color=#787B86)
+hline(0.3, "Lower", color=#787B86)

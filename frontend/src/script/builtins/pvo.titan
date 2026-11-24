@@ -1,0 +1,16 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Hacim Yüzde Osilatörü
+// @category osc
+// @desc Hacmin hızlı/yavaş EMA farkı yüzdesi
+indicator("Percentage Volume Oscillator", "PVO", overlay=false, format=format.price, precision=2)
+fast = input.int(12, "Fast Length", minval=1)
+slow = input.int(26, "Slow Length", minval=1)
+sig = input.int(9, "Signal Length", minval=1)
+pvo = (ta.ema(volume, fast) - ta.ema(volume, slow)) / ta.ema(volume, slow) * 100
+signal = ta.ema(pvo, sig)
+hist = pvo - signal
+plot(hist, "Histogram", style=plot.style_columns, color=hist >= 0 ? #26A69A : #FF5252)
+plot(pvo, "PVO", color=#0284C7)
+plot(signal, "Signal", color=#FF6D00)
+hline(0, "Zero", color=#787B86)

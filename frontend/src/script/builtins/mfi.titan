@@ -1,0 +1,13 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Para Akışı Endeksi
+// @category osc
+// @desc Hacim ağırlıklı RSI
+indicator("Money Flow Index", "MFI", overlay=false, format=format.price, precision=2)
+period = input.int(14, "Length", minval=1)
+mfiVal = ta.mfi(hlc3, period)
+plot(mfiVal, "MF", color=#8B5CF6)
+hiLine = hline(80, "Overbought", color=#64748B)
+hline(50, "Middle Band", color=color.new(#64748B, 50))
+loLine = hline(20, "Oversold", color=#64748B)
+fill(hiLine, loLine, color=color.new(#8B5CF6, 90), title="Background")

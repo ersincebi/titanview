@@ -1,0 +1,11 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Uzun Üst Gölge
+// @category pattern
+// @desc Mum formasyonu — ayı (düşüş) sinyali (LS)
+indicator("Long Upper Shadow", "LS", overlay=true)
+bodyTop = math.max(open, close)
+barRange = high - low
+upperWick = high - bodyTop
+detected = barRange > 0 and upperWick >= barRange * 0.75
+plotshape(detected, "Long Upper Shadow", style=shape.labeldown, location=location.abovebar, color=color.new(#F23645, 0), text="LS", textcolor=color.white, size=size.small)

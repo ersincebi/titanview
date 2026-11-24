@@ -1,0 +1,15 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Donchian Kanalları
+// @category volatility
+// @desc N barın en yüksek / en düşük kanalı
+indicator("Donchian Channels", "DC", overlay=true)
+period = input.int(20, "Length", minval=1)
+shift = input.int(0, "Offset", minval=-500, maxval=500)
+hiCh = ta.highest(high, period)
+loCh = ta.lowest(low, period)
+midCh = (hiCh + loCh) / 2.0
+plot(midCh, "Basis", color=#F59E0B, offset=shift)
+uPlot = plot(hiCh, "Upper", color=#0284C7, offset=shift)
+lPlot = plot(loCh, "Lower", color=#0284C7, offset=shift)
+fill(uPlot, lPlot, color=color.new(#0284C7, 92), title="Background")

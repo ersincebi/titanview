@@ -1,0 +1,22 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Sabah Doji Yıldızı
+// @category pattern
+// @desc Mum formasyonu — boğa (yükseliş) sinyali (MDS)
+indicator("Morning Doji Star", "MDS", overlay=true)
+trendMode = input.string("SMA50", "Detect Trend Based On", options=["SMA50", "SMA50, SMA200", "No detection"])
+sma50 = ta.sma(close, 50)
+sma200 = ta.sma(close, 200)
+inDowntrend = trendMode == "No detection" ? true : trendMode == "SMA50" ? close < sma50 : close < sma50 and sma50 < sma200
+bodyTop = math.max(open, close)
+bodyBot = math.min(open, close)
+bodySize = bodyTop - bodyBot
+barRange = high - low
+avgBody = ta.ema(bodySize, 14)
+isLong = bodySize > avgBody
+isBull = close > open
+isBear = close < open
+bodyMid = (bodyTop + bodyBot) * 0.5
+isDojiBody = barRange > 0 and bodySize <= barRange * 0.05
+detected = inDowntrend[2] and isBear[2] and isLong[2] and isDojiBody[1] and bodyTop[1] < bodyBot[2] and isBull and isLong and close >= bodyMid[2]
+plotshape(detected, "Morning Doji Star", style=shape.labelup, location=location.belowbar, color=color.new(#089981, 0), text="MDS", textcolor=color.white, size=size.small)

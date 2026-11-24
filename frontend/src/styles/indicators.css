@@ -1,0 +1,48 @@
+/* Faz 20 — Göstergeler penceresi, lejant satırları, ayar penceresi */
+.fx-list { overflow-y: auto; max-height: min(62vh, 560px); }
+.fx-builtin-row { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 6px 8px; border-radius: 6px; }
+.fx-builtin-row:hover { background: var(--bg-hover); }
+.fx-row-main { flex: 1; min-width: 0; }
+.fx-row-title { font-weight: 600; color: var(--text-primary); font-size: 13px; }
+.fx-row-desc { font-size: 11px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fx-star { all: unset; cursor: pointer; width: 18px; text-align: center; color: var(--text-secondary); font-size: 15px; }
+.fx-star.active { color: #f5c518; }
+.fx-count { background: var(--accent); color: #fff; border-radius: 9px; font-size: 11px; padding: 0 7px; line-height: 18px; }
+.fx-empty { color: var(--text-secondary); font-size: 12px; padding: 16px 8px; }
+.fav-ind-wrap { position: relative; display: inline-flex; }
+.fav-ind-menu { position: absolute; top: 100%; left: 0; z-index: 60; min-width: 220px; max-height: 60vh; overflow-y: auto; }
+
+.study-legend-row { pointer-events: auto; max-width: 100%; }
+.study-legend-row .study-name { cursor: default; white-space: nowrap; }
+.study-legend-row .study-val { font-weight: 500; font-variant-numeric: tabular-nums; }
+.study-legend-row.study-hidden .study-name { text-decoration: line-through; opacity: 0.7; }
+.study-err { color: var(--bear); font-size: 11px; max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+#study-menu { position: fixed; z-index: 80; min-width: 230px; }
+.pane-menu-study { display: flex; align-items: center; gap: 4px; padding: 2px 8px; }
+.pane-menu-study-name { flex: 1; font-size: 12px; color: var(--text-primary); }
+
+.study-tabs { display: flex; gap: 2px; padding: 0 16px; border-bottom: 1px solid var(--border-color); }
+.study-tab-btn { all: unset; cursor: pointer; padding: 10px 12px; font-size: 14px; color: var(--text-secondary); border-bottom: 2px solid transparent; }
+.study-tab-btn.active { color: var(--text-primary); border-bottom-color: var(--text-primary); }
+.study-tab-body { padding: 14px 16px; max-height: min(58vh, 520px); overflow-y: auto; }
+.study-tab { display: flex; flex-direction: column; gap: 8px; }
+.study-style-row, .study-vis-row { display: flex; align-items: center; gap: 8px; }
+.study-style-row .study-check { flex: 1; min-width: 0; }
+.study-check { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-primary); }
+.study-check span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.study-color { display: inline-flex; align-items: center; gap: 4px; }
+.study-color input[type='color'] { width: 28px; height: 22px; padding: 0; border: 1px solid var(--border-color); border-radius: 4px; background: transparent; }
+.study-color input[type='range'] { width: 64px; }
+.study-hint { color: var(--text-secondary); font-size: 12px; }
+.study-vis-row .study-check { width: 110px; }
+.study-vis-row .script-inp-field { width: 70px; }
+.study-footer { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-top: 1px solid var(--border-color); position: relative; }
+.study-defaults { position: relative; }
+.study-defaults-menu { position: absolute; bottom: 110%; left: 0; min-width: 220px; z-index: 5; }
+.study-template-item { display: flex; align-items: center; gap: 6px; }
+
+@media (max-width: 820px) {
+  .study-style-row { flex-wrap: wrap; }
+  .study-tab-body { max-height: none; }
+}

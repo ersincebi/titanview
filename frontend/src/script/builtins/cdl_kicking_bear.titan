@@ -1,0 +1,17 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Tekme Ayı
+// @category pattern
+// @desc Mum formasyonu — ayı (düşüş) sinyali (K)
+indicator("Kicking - Bearish", "K", overlay=true)
+bodyTop = math.max(open, close)
+bodyBot = math.min(open, close)
+bodySize = bodyTop - bodyBot
+upperWick = high - bodyTop
+lowerWick = bodyBot - low
+avgBody = ta.ema(bodySize, 14)
+isLong = bodySize > avgBody
+isBull = close > open
+isBear = close < open
+detected = isBull[1] and isLong[1] and upperWick[1] <= bodySize[1] * 0.05 and lowerWick[1] <= bodySize[1] * 0.05 and isBear and isLong and upperWick <= bodySize * 0.05 and lowerWick <= bodySize * 0.05 and open < open[1]
+plotshape(detected, "Kicking - Bearish", style=shape.labeldown, location=location.abovebar, color=color.new(#F23645, 0), text="K", textcolor=color.white, size=size.small)

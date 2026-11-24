@@ -1,0 +1,26 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Dokunulmamış Günlük Pivotlar
+// @category other
+// @desc Fiyatın henüz dokunmadığı önceki günlük pivotlar
+indicator("Untouched Daily Pivots", "Open Pivots", overlay=true, max_lines_count=100)
+var array<line> openPivots = array.new<line>()
+var float dayHi = na
+var float dayLo = na
+if timeframe.change("D")
+    if not na(dayHi)
+        lvl = (dayHi + dayLo + close[1]) / 3.0
+        array.push(openPivots, line.new(bar_index, lvl, bar_index + 1, lvl, color=#F59E0B, extend=extend.right, style=line.style_dashed))
+    dayHi := high
+    dayLo := low
+else
+    dayHi := na(dayHi) ? high : math.max(dayHi, high)
+    dayLo := na(dayLo) ? low : math.min(dayLo, low)
+if array.size(openPivots) > 0
+    for idx = array.size(openPivots) - 1 to 0
+        ln = array.get(openPivots, idx)
+        lvl = line.get_y1(ln)
+        if high >= lvl and low <= lvl and line.get_x1(ln) < bar_index
+            line.delete(ln)
+            array.remove(openPivots, idx)
+plot(na, "Open Pivots", display=display.none)

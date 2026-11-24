@@ -1,0 +1,11 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Ortalama Gerçek Aralık
+// @category volatility
+// @desc Gerçek aralığın düzleştirilmiş ortalaması
+indicator("Average True Range", "ATR", overlay=false)
+period = input.int(14, "Length", minval=1)
+method = input.string("RMA", "Smoothing", options=["RMA", "SMA", "EMA", "WMA"])
+trVal = ta.tr(true)
+atrVal = method == "RMA" ? ta.rma(trVal, period) : method == "SMA" ? ta.sma(trVal, period) : method == "EMA" ? ta.ema(trVal, period) : ta.wma(trVal, period)
+plot(atrVal, "ATR", color=#E11D48)

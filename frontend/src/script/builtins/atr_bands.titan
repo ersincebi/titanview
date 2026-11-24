@@ -1,0 +1,13 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr ATR Bantları
+// @category volatility
+// @desc Kapanış ± ATR katı
+indicator("ATR Bands", "ATR Bands", overlay=true)
+length = input.int(14, "ATR Length", minval=1)
+mult = input.float(2.0, "Multiplier", step=0.1)
+src = input(close, "Source")
+a = ta.atr(length) * mult
+u = plot(src + a, "Upper", color=#0284C7)
+l = plot(src - a, "Lower", color=#0284C7)
+fill(u, l, color=color.rgb(33, 150, 243, 95), title="Background")

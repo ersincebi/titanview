@@ -1,0 +1,19 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Bollinger Bantları
+// @category volatility
+// @desc Ortalama ± k·standart sapma
+indicator("Bollinger Bands", "BB", overlay=true)
+period = input.int(20, "Length", minval=1)
+basisKind = input.string("SMA", "Basis MA Type", options=["SMA", "EMA", "SMMA (RMA)", "WMA", "VWMA"])
+price = input.source(close, "Source")
+k = input.float(2.0, "StdDev", minval=0.001, maxval=50.0)
+shift = input.int(0, "Offset", minval=-500, maxval=500)
+basis = basisKind == "EMA" ? ta.ema(price, period) : basisKind == "SMMA (RMA)" ? ta.rma(price, period) : basisKind == "WMA" ? ta.wma(price, period) : basisKind == "VWMA" ? ta.vwma(price, period) : ta.sma(price, period)
+sigma = k * ta.stdev(price, period)
+topBand = basis + sigma
+botBand = basis - sigma
+plot(basis, "Basis", color=#0284C7, offset=shift)
+uPlot = plot(topBand, "Upper", color=#F23645, offset=shift)
+lPlot = plot(botBand, "Lower", color=#089981, offset=shift)
+fill(uPlot, lPlot, title="Background", color=color.new(#0284C7, 92))

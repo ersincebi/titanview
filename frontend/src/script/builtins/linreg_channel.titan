@@ -1,0 +1,47 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Doğrusal Regresyon Kanalı
+// @category trend
+// @desc Son N bar için regresyon doğrusu ve sapma kanalı
+indicator("Linear Regression Channel", "LinReg", overlay=true, max_lines_count=3)
+win = input.int(100, "Length", minval=2, maxval=5000)
+price = input.source(close, "Source")
+upMult = input.float(2.0, "Upper Deviation")
+dnMult = input.float(2.0, "Lower Deviation")
+upFill = input.color(color.new(#0284C7, 85), "Upper Color")
+dnFill = input.color(color.new(#F23645, 85), "Lower Color")
+var line midLn = na
+var line topLn = na
+var line botLn = na
+if barstate.islast and bar_index >= win
+    sx = 0.0
+    sy = 0.0
+    sxx = 0.0
+    sxy = 0.0
+    for j = 0 to win - 1
+        x = float(win - 1 - j)
+        y = price[j]
+        sx += x
+        sy += y
+        sxx += x * x
+        sxy += x * y
+    denom = win * sxx - sx * sx
+    slope = denom != 0 ? (win * sxy - sx * sy) / denom : 0.0
+    intercept = (sy - slope * sx) / win
+    yStart = intercept
+    yEnd = intercept + slope * (win - 1)
+    sse = 0.0
+    for j = 0 to win - 1
+        x = float(win - 1 - j)
+        resid = price[j] - (intercept + slope * x)
+        sse += resid * resid
+    sd = math.sqrt(sse / (win - 1))
+    line.delete(midLn)
+    line.delete(topLn)
+    line.delete(botLn)
+    x0 = bar_index - win + 1
+    midLn := line.new(x0, yStart, bar_index, yEnd, width=1, extend=extend.right, color=#F23645)
+    topLn := line.new(x0, yStart + sd * upMult, bar_index, yEnd + sd * upMult, width=1, extend=extend.right, color=#0284C7)
+    botLn := line.new(x0, yStart - sd * dnMult, bar_index, yEnd - sd * dnMult, width=1, extend=extend.right, color=#F23645)
+    linefill.new(topLn, midLn, color=upFill)
+    linefill.new(midLn, botLn, color=dnFill)

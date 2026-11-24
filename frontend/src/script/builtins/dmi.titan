@@ -1,0 +1,20 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Yönsel Hareket Endeksi
+// @category trend
+// @desc +DI, −DI ve ADX
+indicator("Directional Movement Index", "DMI", overlay=false, format=format.price, precision=4)
+adxPeriod = input.int(14, "ADX Smoothing", minval=1, maxval=50)
+diPeriod = input.int(14, "DI Length", minval=1)
+upStep = high - high[1]
+dnStep = low[1] - low
+posDm = na(upStep) ? na : (upStep > dnStep and upStep > 0 ? upStep : 0.0)
+negDm = na(dnStep) ? na : (dnStep > upStep and dnStep > 0 ? dnStep : 0.0)
+trSmooth = ta.rma(ta.tr, diPeriod)
+diPlus = fixnan(100.0 * ta.rma(posDm, diPeriod) / trSmooth)
+diMinus = fixnan(100.0 * ta.rma(negDm, diPeriod) / trSmooth)
+diSum = diPlus + diMinus
+adxVal = 100.0 * ta.rma(math.abs(diPlus - diMinus) / (diSum == 0 ? 1.0 : diSum), adxPeriod)
+plot(adxVal, "ADX", color=#E11D48)
+plot(diPlus, "+DI", color=#0284C7)
+plot(diMinus, "-DI", color=#F59E0B)

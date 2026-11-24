@@ -1,0 +1,8 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Fiyat Hacim Trendi
+// @category volume
+// @desc Yüzde değişim × hacim kümülatifi
+indicator("Price Volume Trend", "PVT", overlay=false, format=format.volume)
+ret = (close - close[1]) / close[1]
+plot(ta.cum(ret * volume), "PVT", color=#0284C7)

@@ -1,0 +1,17 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Üçlü Yıldız Boğa
+// @category pattern
+// @desc Mum formasyonu — boğa (yükseliş) sinyali (3S)
+indicator("Tri-Star - Bullish", "3S", overlay=true)
+trendMode = input.string("SMA50", "Detect Trend Based On", options=["SMA50", "SMA50, SMA200", "No detection"])
+sma50 = ta.sma(close, 50)
+sma200 = ta.sma(close, 200)
+inDowntrend = trendMode == "No detection" ? true : trendMode == "SMA50" ? close < sma50 : close < sma50 and sma50 < sma200
+bodyTop = math.max(open, close)
+bodyBot = math.min(open, close)
+bodySize = bodyTop - bodyBot
+barRange = high - low
+isDojiBody = barRange > 0 and bodySize <= barRange * 0.05
+detected = inDowntrend[2] and isDojiBody[2] and isDojiBody[1] and isDojiBody and bodyTop[1] < bodyBot[2] and bodyTop[1] < bodyBot
+plotshape(detected, "Tri-Star - Bullish", style=shape.labelup, location=location.belowbar, color=color.new(#089981, 0), text="3S", textcolor=color.white, size=size.small)

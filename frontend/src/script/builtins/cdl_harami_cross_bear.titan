@@ -1,0 +1,20 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Harami Haçı Ayı
+// @category pattern
+// @desc Mum formasyonu — ayı (düşüş) sinyali (HC)
+indicator("Harami Cross - Bearish", "HC", overlay=true)
+trendMode = input.string("SMA50", "Detect Trend Based On", options=["SMA50", "SMA50, SMA200", "No detection"])
+sma50 = ta.sma(close, 50)
+sma200 = ta.sma(close, 200)
+inUptrend = trendMode == "No detection" ? true : trendMode == "SMA50" ? close > sma50 : close > sma50 and sma50 > sma200
+bodyTop = math.max(open, close)
+bodyBot = math.min(open, close)
+bodySize = bodyTop - bodyBot
+barRange = high - low
+avgBody = ta.ema(bodySize, 14)
+isLong = bodySize > avgBody
+isBull = close > open
+isDojiBody = barRange > 0 and bodySize <= barRange * 0.05
+detected = inUptrend and isBull[1] and isLong[1] and isDojiBody and high <= bodyTop[1] and low >= bodyBot[1]
+plotshape(detected, "Harami Cross - Bearish", style=shape.labeldown, location=location.abovebar, color=color.new(#F23645, 0), text="HC", textcolor=color.white, size=size.small)

@@ -1,0 +1,19 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Boyun Üstü
+// @category pattern
+// @desc Mum formasyonu — ayı (düşüş) sinyali (ON)
+indicator("On Neck", "ON", overlay=true)
+trendMode = input.string("SMA50", "Detect Trend Based On", options=["SMA50", "SMA50, SMA200", "No detection"])
+sma50 = ta.sma(close, 50)
+sma200 = ta.sma(close, 200)
+inDowntrend = trendMode == "No detection" ? true : trendMode == "SMA50" ? close < sma50 : close < sma50 and sma50 < sma200
+bodyTop = math.max(open, close)
+bodyBot = math.min(open, close)
+bodySize = bodyTop - bodyBot
+avgBody = ta.ema(bodySize, 14)
+isLong = bodySize > avgBody
+isBull = close > open
+isBear = close < open
+detected = inDowntrend and isBear[1] and isLong[1] and isBull and open < low[1] and math.abs(close - low[1]) <= avgBody * 0.05
+plotshape(detected, "On Neck", style=shape.labeldown, location=location.abovebar, color=color.new(#F23645, 0), text="ON", textcolor=color.white, size=size.small)

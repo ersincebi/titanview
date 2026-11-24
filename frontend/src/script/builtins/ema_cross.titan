@@ -1,0 +1,13 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr EMA Kesişimi
+// @category ma
+// @desc İki EMA kesişimi
+indicator("EMA Cross", "EMA Cross", overlay=true)
+fastPeriod = input.int(9, "Short EMA Length", minval=1)
+slowPeriod = input.int(26, "Long EMA Length", minval=1)
+fastEma = ta.ema(close, fastPeriod)
+slowEma = ta.ema(close, slowPeriod)
+plot(fastEma, "Short", color=#F59E0B)
+plot(slowEma, "Long", color=#16A34A)
+plot(ta.cross(fastEma, slowEma) ? fastEma : na, "Cross", color=#0284C7, style=plot.style_cross, linewidth=4)

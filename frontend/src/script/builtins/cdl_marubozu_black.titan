@@ -1,0 +1,16 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Siyah Marubozu
+// @category pattern
+// @desc Mum formasyonu — ayı (düşüş) sinyali (MB)
+indicator("Marubozu Black", "MB", overlay=true)
+bodyTop = math.max(open, close)
+bodyBot = math.min(open, close)
+bodySize = bodyTop - bodyBot
+upperWick = high - bodyTop
+lowerWick = bodyBot - low
+avgBody = ta.ema(bodySize, 14)
+isLong = bodySize > avgBody
+isBear = close < open
+detected = isBear and isLong and upperWick <= bodySize * 0.05 and lowerWick <= bodySize * 0.05
+plotshape(detected, "Marubozu Black", style=shape.labeldown, location=location.abovebar, color=color.new(#F23645, 0), text="MB", textcolor=color.white, size=size.small)

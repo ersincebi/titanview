@@ -1,0 +1,28 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Hareketli Ortalama Şeridi
+// @category ma
+// @desc Dört ayarlanabilir ortalama
+indicator("Moving Average Ribbon", "MA Ribbon", overlay=true)
+calcMa(float s, simple int n, string k) =>
+    k == "EMA" ? ta.ema(s, n) : k == "SMMA (RMA)" ? ta.rma(s, n) : k == "WMA" ? ta.wma(s, n) : k == "VWMA" ? ta.vwma(s, n) : ta.sma(s, n)
+on1 = input.bool(true, "MA 1", inline="r1")
+t1 = input.string("SMA", "", inline="r1", options=["SMA", "EMA", "SMMA (RMA)", "WMA", "VWMA"])
+s1 = input.source(close, "", inline="r1")
+l1 = input.int(20, "", inline="r1", minval=1)
+on2 = input.bool(true, "MA 2", inline="r2")
+t2 = input.string("SMA", "", inline="r2", options=["SMA", "EMA", "SMMA (RMA)", "WMA", "VWMA"])
+s2 = input.source(close, "", inline="r2")
+l2 = input.int(50, "", inline="r2", minval=1)
+on3 = input.bool(true, "MA 3", inline="r3")
+t3 = input.string("SMA", "", inline="r3", options=["SMA", "EMA", "SMMA (RMA)", "WMA", "VWMA"])
+s3 = input.source(close, "", inline="r3")
+l3 = input.int(100, "", inline="r3", minval=1)
+on4 = input.bool(true, "MA 4", inline="r4")
+t4 = input.string("SMA", "", inline="r4", options=["SMA", "EMA", "SMMA (RMA)", "WMA", "VWMA"])
+s4 = input.source(close, "", inline="r4")
+l4 = input.int(200, "", inline="r4", minval=1)
+plot(on1 ? calcMa(s1, l1, t1) : na, "MA 1", color=#38BDF8)
+plot(on2 ? calcMa(s2, l2, t2) : na, "MA 2", color=#F59E0B)
+plot(on3 ? calcMa(s3, l3, t3) : na, "MA 3", color=#EA580C)
+plot(on4 ? calcMa(s4, l4, t4) : na, "MA 4", color=#EF4444)

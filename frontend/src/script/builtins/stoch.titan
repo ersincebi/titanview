@@ -1,0 +1,17 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Stokastik
+// @category osc
+// @desc %K ve %D: kapanışın aralık içindeki konumu
+indicator("Stochastic", "Stoch", overlay=false, format=format.price, precision=2)
+kPeriod = input.int(14, "%K Length", minval=1)
+kSmooth = input.int(1, "%K Smoothing", minval=1)
+dSmooth = input.int(3, "%D Smoothing", minval=1)
+kLine = ta.sma(ta.stoch(close, high, low, kPeriod), kSmooth)
+dLine = ta.sma(kLine, dSmooth)
+plot(kLine, "%K", color=#0284C7)
+plot(dLine, "%D", color=#F59E0B)
+hiLine = hline(80, "Upper Band", color=#64748B)
+hline(50, "Middle Band", color=color.new(#64748B, 50))
+loLine = hline(20, "Lower Band", color=#64748B)
+fill(hiLine, loLine, color=color.new(#0284C7, 90), title="Background")

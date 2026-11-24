@@ -1,0 +1,12 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Ülser Endeksi
+// @category volatility
+// @desc Tepeden düşüş derinliği ölçüsü
+indicator("Ulcer Index", "Ulcer Index", overlay=false, format=format.price, precision=2)
+length = input.int(14, "Length", minval=1)
+src = input(close, "Source")
+hh = ta.highest(src, length)
+dd = 100 * (src - hh) / hh
+ulcer = math.sqrt(math.sum(dd * dd, length) / length)
+plot(ulcer, "Ulcer Index", color=#0284C7)

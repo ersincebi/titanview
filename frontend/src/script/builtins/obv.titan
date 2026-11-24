@@ -1,0 +1,11 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Denge Hacmi
+// @category volume
+// @desc Yön değişimine göre kümülatif hacim
+indicator("On Balance Volume", "OBV", overlay=false, format=format.volume)
+maLen = input.int(14, "MA Length", minval=1, group="Smoothing")
+dir = close > close[1] ? 1.0 : close < close[1] ? -1.0 : 0.0
+obvVal = ta.cum(na(close[1]) ? 0.0 : dir * volume)
+plot(obvVal, "OnBalanceVolume", color=#0284C7)
+plot(ta.sma(obvVal, maLen), "OBV-based MA", color=#F59E0B)

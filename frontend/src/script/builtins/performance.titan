@@ -1,0 +1,27 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Performans Tablosu
+// @category other
+// @desc 1H/1A/3A/6A/YTD/1Y getiri tablosu
+indicator("Performance", "Perf", overlay=true)
+perf(int bars) => bars < bar_index ? (close - close[bars]) / close[bars] * 100 : na
+var table t = table.new(position.bottom_right, 6, 2, border_width=1)
+d = timeframe.isdaily ? 1 : timeframe.isweekly ? 5 : timeframe.ismonthly ? 21 : math.max(1, math.round(86400 / timeframe.in_seconds()))
+f = timeframe.isintraday ? d : 1
+w1 = timeframe.isweekly ? 1 : timeframe.ismonthly ? 1 : 5 * f
+m1 = timeframe.isweekly ? 4 : timeframe.ismonthly ? 1 : 21 * f
+p1w = perf(math.round(w1))
+p1m = perf(math.round(m1))
+p3m = perf(math.round(m1 * 3))
+p6m = perf(math.round(m1 * 6))
+p1y = perf(math.round(m1 * 12))
+plot(close, "Close", display=display.none)
+cell(int col, string name, float v) =>
+    table.cell(t, col, 0, name, text_color=color.white, bgcolor=#363A45)
+    table.cell(t, col, 1, na(v) ? "—" : str.tostring(v, "#.##") + "%", text_color=color.white, bgcolor=na(v) ? #363A45 : v >= 0 ? color.new(#089981, 40) : color.new(#F23645, 40))
+if barstate.islast
+    cell(0, "1H", p1w)
+    cell(1, "1A", p1m)
+    cell(2, "3A", p3m)
+    cell(3, "6A", p6m)
+    cell(4, "1Y", p1y)

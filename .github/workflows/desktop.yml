@@ -1,0 +1,211 @@
+# Faz 31 — Masaüstü paketleri (Tauri v2 + Go sidecar)
+# macOS (aarch64 + x86_64) dmg + updater .app.tar.gz · Windows nsis exe + msi · Linux AppImage + deb + rpm
+# Sırlar yalnız GitHub Secrets'ta; yoksa ilgili imza adımı atlanır (ad-hoc / imzasız paket).
+#   TAURI_SIGNING_PRIVATE_KEY, TAURI_SIGNING_PRIVATE_KEY_PASSWORD  → güncelleme imzası (minisign)
+#   APPLE_CERTIFICATE, APPLE_CERTIFICATE_PASSWORD, APPLE_SIGNING_IDENTITY → macOS kod imzası
+#   APPLE_ID, APPLE_PASSWORD, APPLE_TEAM_ID                        → macOS notarization
+#   WINDOWS_CERTIFICATE (pfx, base64), WINDOWS_CERTIFICATE_PASSWORD → Windows Authenticode
+name: desktop
+# Runs on version tags (v*), published releases, or manual workflow_dispatch.
+on:
+  push:
+    tags: ['v*']
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: desktop-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  bundle:
+    name: ${{ matrix.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macOS arm64
+            os: macos-latest
+            target: aarch64-apple-darwin
+            bundles: app,dmg
+          - name: macOS x64
+            os: macos-latest
+            target: x86_64-apple-darwin
+            bundles: app,dmg
+          - name: Windows x64
+            os: windows-latest
+            target: x86_64-pc-windows-msvc
+            bundles: nsis,msi
+          - name: Linux x64
+            os: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+            bundles: appimage,deb,rpm
+    runs-on: ${{ matrix.os }}
+    env:
+      TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+      TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Linux bağımlılıkları
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libayatana-appindicator3-dev librsvg2-dev libxdo-dev libssl-dev patchelf file rpm
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }},wasm32-unknown-unknown
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+          key: ${{ matrix.target }}
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Güncelleme imzası yoksa updater yapıtlarını kapat
+        shell: bash
+        run: |
+          if [ -z "$TAURI_SIGNING_PRIVATE_KEY" ]; then
+            echo "::warning::TAURI_SIGNING_PRIVATE_KEY yok: imzasız paket, updater yapıtı üretilmeyecek"
+            echo 'EXTRA_CONFIG={"bundle":{"createUpdaterArtifacts":false}}' >> "$GITHUB_ENV"
+          else
+            echo 'EXTRA_CONFIG={}' >> "$GITHUB_ENV"
+          fi
+
+      - name: macOS imza + notarization (sır varsa)
+        if: runner.os == 'macOS'
+        shell: bash
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          if [ -n "$APPLE_CERTIFICATE" ]; then
+            # Tauri CLI sertifikayı geçici anahtarlığa alır, imzalar; APPLE_ID/APPLE_PASSWORD/APPLE_TEAM_ID varsa notarize eder.
+            for v in APPLE_CERTIFICATE APPLE_CERTIFICATE_PASSWORD APPLE_SIGNING_IDENTITY APPLE_ID APPLE_PASSWORD APPLE_TEAM_ID; do
+              [ -n "${!v}" ] && { echo "$v<<__EOF__"; echo "${!v}"; echo "__EOF__"; } >> "$GITHUB_ENV"
+            done
+            echo "macOS: Developer ID ile imzalanacak"
+          else
+            echo "::warning::APPLE_CERTIFICATE yok: ad-hoc imzalı, notarize edilmemiş paket"
+          fi
+
+      - name: Windows Authenticode (sır varsa)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        env:
+          WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
+          WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+        run: |
+          if ($env:WINDOWS_CERTIFICATE) {
+            $pfx = Join-Path $env:RUNNER_TEMP 'cert.pfx'
+            [IO.File]::WriteAllBytes($pfx, [Convert]::FromBase64String($env:WINDOWS_CERTIFICATE))
+            $pw = ConvertTo-SecureString $env:WINDOWS_CERTIFICATE_PASSWORD -AsPlainText -Force
+            $cert = Import-PfxCertificate -FilePath $pfx -CertStoreLocation Cert:\CurrentUser\My -Password $pw
+            Remove-Item $pfx
+            $cfg = @{ bundle = @{ createUpdaterArtifacts = (-not [string]::IsNullOrEmpty($env:TAURI_SIGNING_PRIVATE_KEY)); windows = @{ certificateThumbprint = $cert.Thumbprint } } } | ConvertTo-Json -Compress -Depth 5
+            "EXTRA_CONFIG=$cfg" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+            "Windows: $($cert.Subject) ile imzalanacak"
+          } else {
+            "::warning::WINDOWS_CERTIFICATE yok: imzasız kurulum paketleri"
+          }
+
+      - name: Paketle
+        shell: bash
+        run: pnpm tauri build --ci --target ${{ matrix.target }} --bundles ${{ matrix.bundles }} --config "$EXTRA_CONFIG"
+
+      - name: Kabuk testleri (gerçek sidecar ile)
+        shell: bash
+        run: |
+          ext=""; [ "$RUNNER_OS" = "Windows" ] && ext=".exe"
+          export TITAN_SIDECAR_BIN="$PWD/src-tauri/binaries/titanview-server-${{ matrix.target }}$ext"
+          if [ "${{ matrix.target }}" = "x86_64-apple-darwin" ]; then
+            # arm64 koşucuda x64 testleri Rosetta ile çalışır
+            cd src-tauri && cargo test --release --target ${{ matrix.target }} -- --test-threads=1
+          else
+            cd src-tauri && cargo test --release --target ${{ matrix.target }}
+          fi
+
+      - name: Sidecar paketin içinde mi?
+        shell: bash
+        run: |
+          B=src-tauri/target/${{ matrix.target }}/release/bundle
+          find "$B" -maxdepth 3 | sort
+          case "$RUNNER_OS" in
+            macOS) test -x "$B/macos/TitanView.app/Contents/MacOS/titanview-server" ;;
+            Linux) dpkg-deb -c "$B"/deb/*.deb | grep -q 'usr/bin/titanview-server' && rpm -qlp "$B"/rpm/*.rpm | grep -q 'titanview-server' ;;
+            Windows) test -f src-tauri/target/${{ matrix.target }}/release/titanview-server.exe ;;
+          esac
+          echo "sidecar paket içinde ✓"
+
+      - name: Yapıtları topla
+        shell: bash
+        run: |
+          B=src-tauri/target/${{ matrix.target }}/release/bundle
+          V=$(node -p "require('./src-tauri/tauri.conf.json').version")
+          mkdir -p out
+          case "$RUNNER_OS" in
+            macOS)
+              arch=$([ "${{ matrix.target }}" = "aarch64-apple-darwin" ] && echo aarch64 || echo x64)
+              cp "$B"/dmg/*.dmg out/
+              if [ -f "$B/macos/TitanView.app.tar.gz" ]; then
+                cp "$B/macos/TitanView.app.tar.gz" "out/TitanView_${V}_${arch}.app.tar.gz"
+                cp "$B/macos/TitanView.app.tar.gz.sig" "out/TitanView_${V}_${arch}.app.tar.gz.sig"
+              fi
+              codesign -dv --verbose=2 "$B/macos/TitanView.app" 2>&1 | tee out/codesign-${arch}.txt || true ;;
+            Windows)
+              cp "$B"/nsis/*.exe "$B"/msi/*.msi out/
+              cp "$B"/nsis/*.sig out/ 2>/dev/null || true ;;
+            Linux)
+              cp "$B"/appimage/*.AppImage "$B"/deb/*.deb "$B"/rpm/*.rpm out/
+              cp "$B"/appimage/*.sig out/ 2>/dev/null || true ;;
+          esac
+          # Özet dosyası kendini listelemesin: önce hesapla, sonra yaz.
+          (cd out && ls -la && sums=$(sha256sum * 2>/dev/null || shasum -a 256 *) && printf '%s\n' "$sums" > SHA256SUMS-${{ matrix.target }}.txt && cat SHA256SUMS-${{ matrix.target }}.txt)
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: titanview-${{ matrix.target }}
+          path: out/*
+          if-no-files-found: error
+
+  release:
+    name: Sürüm + latest.json
+    needs: bundle
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist-desktop
+          merge-multiple: true
+      - name: latest.json
+        run: node scripts/updater-manifest.mjs dist-desktop "${GITHUB_REF_NAME}" "https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}" "TitanView ${GITHUB_REF_NAME}"
+      - name: Sürüm (yoksa oluştur, varsa paketleri ekle)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          NOTES="Desktop packages / Masaüstü paketleri: macOS .dmg, Windows .exe/.msi, Linux .AppImage/.deb/.rpm. Unsigned builds: macOS Gatekeeper and Windows SmartScreen may warn on first launch."
+          if gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
+            gh release upload "${GITHUB_REF_NAME}" dist-desktop/* --clobber
+          else
+            gh release create "${GITHUB_REF_NAME}" --title "TitanView ${GITHUB_REF_NAME}" --notes "$NOTES" dist-desktop/*
+          fi

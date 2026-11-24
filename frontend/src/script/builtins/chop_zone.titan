@@ -1,0 +1,16 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Dalga Bölgesi
+// @category trend
+// @desc EMA eğim açısına göre renkli sütunlar
+indicator("Chop Zone", "Chop Zone", overlay=false, format=format.price, precision=0)
+rangePeriod = input.int(30, "Range Length", minval=2)
+emaPeriod = input.int(34, "EMA Length", minval=2)
+hiN = ta.highest(high, rangePeriod)
+loN = ta.lowest(low, rangePeriod)
+normScale = hiN != loN ? 25.0 * loN / (hiN - loN) : 0.0
+emaVal = ta.ema(close, emaPeriod)
+dy = (emaVal - emaVal[1]) / hlc3 * normScale
+slopeDeg = math.atan(dy) * 180.0 / math.pi
+zoneCol = slopeDeg >= 5.0 ? #06B6D4 : slopeDeg >= 3.57 ? #16A34A : slopeDeg >= 2.14 ? #86EFAC : slopeDeg >= 0.71 ? #0D9488 : slopeDeg <= -5.0 ? #DC2626 : slopeDeg <= -3.57 ? #E11D48 : slopeDeg <= -2.14 ? #EA580C : slopeDeg <= -0.71 ? #FDBA74 : #EAB308
+plot(1, "Chop Zone", style=plot.style_columns, color=zoneCol)

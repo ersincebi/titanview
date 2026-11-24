@@ -1,0 +1,10 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Doğrusal Regresyon Eğrisi
+// @category trend
+// @desc Her bar için regresyon uç değeri
+indicator("Linear Regression Curve", "LRC", overlay=true)
+period = input.int(100, "Length", minval=2)
+shift = input.int(0, "Offset")
+price = input.source(close, "Source")
+plot(ta.linreg(price, period, shift), "Linear Regression Curve", color=#0284C7, linewidth=2)

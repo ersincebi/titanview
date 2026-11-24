@@ -1,0 +1,20 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Connors RSI
+// @category osc
+// @desc RSI, seri RSI ve yüzde sıra ortalaması
+indicator("Connors RSI", "CRSI", overlay=false, format=format.price, precision=2)
+rsiPeriod = input.int(3, "RSI Length", minval=1)
+streakPeriod = input.int(2, "UpDown Length", minval=1)
+rankPeriod = input.int(100, "ROC Length", minval=1)
+var float streak = 0.0
+streak := close > close[1] ? (streak > 0 ? streak + 1.0 : 1.0) : close < close[1] ? (streak < 0 ? streak - 1.0 : -1.0) : 0.0
+compRsi = ta.rsi(close, rsiPeriod)
+compStreak = ta.rsi(streak, streakPeriod)
+compRank = ta.percentrank(ta.roc(close, 1), rankPeriod)
+crsiVal = (compRsi + compStreak + compRank) / 3.0
+plot(crsiVal, "CRSI", color=#0284C7)
+hiBand = hline(70, "Upper Band", color=#64748B)
+hline(50, "Middle Band", color=color.new(#64748B, 50))
+loBand = hline(30, "Lower Band", color=#64748B)
+fill(hiBand, loBand, color=color.new(#0284C7, 90), title="Background")

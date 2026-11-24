@@ -1,0 +1,89 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "TitanView",
+  "version": "1.0.0",
+  "identifier": "dev.titanview.desktop",
+  "build": {
+    "frontendDist": "../dist",
+    "beforeBuildCommand": {
+      "script": "pnpm build && node scripts/build-sidecar.mjs",
+      "cwd": ".."
+    }
+  },
+  "app": {
+    "withGlobalTauri": false,
+    "windows": [],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": [
+      "dmg",
+      "app",
+      "nsis",
+      "msi",
+      "appimage",
+      "deb",
+      "rpm"
+    ],
+    "createUpdaterArtifacts": true,
+    "category": "Finance",
+    "shortDescription": "TitanView — yerel grafik ve TitanScript terminali",
+    "longDescription": "TitanView: yerel (SQLite) önbellekli, çoklu grafikli ve TitanScript destekli piyasa analiz terminali.",
+    "copyright": "© 2026 TitanView",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "externalBin": [
+      "binaries/titanview-server"
+    ],
+    "macOS": {
+      "minimumSystemVersion": "11.0",
+      "signingIdentity": "-",
+      "hardenedRuntime": true,
+      "entitlements": "entitlements.plist"
+    },
+    "windows": {
+      "digestAlgorithm": "sha256",
+      "timestampUrl": "http://timestamp.digicert.com",
+      "nsis": {
+        "installMode": "currentUser",
+        "languages": [
+          "English",
+          "Turkish"
+        ],
+        "displayLanguageSelector": false
+      },
+      "wix": {
+        "language": [
+          "en-US"
+        ]
+      }
+    },
+    "linux": {
+      "deb": {
+        "section": "misc"
+      },
+      "rpm": {
+        "release": "1"
+      }
+    }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDdDNzQwM0Q2N0NCMjk3RkUKUldUK2w3SjgxZ04wZktkWjVpWUgzNXRUNTRLWlVOdFVzR1VFdXdPcjhlNWVtNFQ3c3FtRmpxeHgK",
+      "endpoints": [
+        "https://github.com/ersincebi/titanview/releases/latest/download/latest.json"
+      ],
+      "windows": {
+        "installMode": "passive"
+      }
+    }
+  }
+}

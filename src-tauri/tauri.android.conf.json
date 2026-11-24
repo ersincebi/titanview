@@ -1,0 +1,18 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "identifier": "dev.titanview.mobile",
+  "build": {
+    "beforeBuildCommand": {
+      "script": "pnpm build && node scripts/build-mobile-core.mjs --abi arm64-v8a,x86_64",
+      "cwd": ".."
+    }
+  },
+  "bundle": {
+    "externalBin": [],
+    "createUpdaterArtifacts": false,
+    "android": {
+      "minSdkVersion": 24,
+      "versionCode": 10000
+    }
+  }
+}

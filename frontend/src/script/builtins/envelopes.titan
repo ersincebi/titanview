@@ -1,0 +1,16 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Zarflar
+// @category ma
+// @desc Ortalamanın yüzde bantları
+indicator("Envelope", "Env", overlay=true)
+period = input.int(20, "Length", minval=1)
+pct = input.float(10.0, "Percent", step=0.1)
+price = input.source(close, "Source")
+useEma = input.bool(false, "Exponential")
+center = useEma ? ta.ema(price, period) : ta.sma(price, period)
+ratio = pct / 100.0
+plot(center, "Basis", color=#F59E0B)
+hiLine = plot(center * (1.0 + ratio), "Upper", color=#0284C7)
+loLine = plot(center * (1.0 - ratio), "Lower", color=#0284C7)
+fill(hiLine, loLine, color=color.new(#0284C7, 92), title="Background")

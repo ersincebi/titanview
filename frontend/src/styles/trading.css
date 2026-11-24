@@ -1,0 +1,164 @@
+/* Faz 28 — işlem: grafikte emir çizgileri, emir bileti, paper hesap paneli, Binance onay penceresi */
+
+/* ---------- grafikte emir/pozisyon çizgileri ---------- */
+.tv-order-layer {
+  position: absolute;
+  inset: 0;
+  /* OHLC lejant kutusunun (z 20) üstünde: üst bölgedeki emir etiketleri de tutulabilsin.
+     Katman tıklamaları geçirir; yalnız etiketler pointer-events alır. */
+  z-index: 21;
+  pointer-events: none;
+  overflow: hidden;
+}
+.tv-order-line {
+  position: absolute;
+  left: 0;
+  height: 0;
+  border-top: 1px dashed var(--ol-color);
+  pointer-events: none;
+}
+.tv-order-position { border-top-style: solid; }
+.tv-order-line.dragging { border-top-width: 2px; z-index: 2; }
+.tv-order-line.ghost { opacity: 0.85; }
+.tv-order-label {
+  position: absolute;
+  right: 12px;
+  top: -10px;
+  display: flex;
+  align-items: stretch;
+  height: 20px;
+  font: 600 11px/20px var(--font-sans);
+  color: var(--text-strong);
+  background: var(--bg-panel);
+  border: 1px solid var(--ol-color);
+  border-radius: 3px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  white-space: nowrap;
+  pointer-events: auto;
+  user-select: none;
+  touch-action: none;
+}
+.tv-order-label.draggable { cursor: ns-resize; }
+.tv-order-qty {
+  padding: 0 6px;
+  background: var(--ol-color);
+  color: #fff;
+  font-family: var(--font-mono);
+}
+.tv-order-text { padding: 0 6px; font-family: var(--font-mono); }
+.tv-order-text.pos { color: var(--bull); }
+.tv-order-text.neg { color: var(--bear); }
+.tv-order-handle,
+.tv-order-x {
+  border: 0;
+  border-left: 1px solid var(--border-color);
+  background: transparent;
+  color: var(--text-secondary);
+  font: 700 10px/18px var(--font-sans);
+  padding: 0 6px;
+  cursor: pointer;
+}
+.tv-order-handle { cursor: ns-resize; touch-action: none; }
+.tv-order-handle.tp { color: var(--bull); }
+.tv-order-handle.sl { color: var(--bear); }
+.tv-order-x:hover,
+.tv-order-handle:hover { background: var(--bg-hover); color: var(--text-strong); }
+.tv-order-price {
+  position: absolute;
+  top: -9px;
+  width: 62px;
+  height: 18px;
+  font: 600 11px/18px var(--font-mono);
+  text-align: center;
+  color: #fff;
+  background: var(--ol-color);
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+/* ---------- emir bileti ---------- */
+.tk-panel { display: flex; flex-direction: column; gap: 8px; padding: 12px; overflow-y: auto; font-size: 12px; }
+.tk-brokers, .tk-types, .tk-sides, .tk-acct-tabs { display: flex; gap: 4px; }
+.tk-brokers button, .tk-types button, .tk-acct-tabs button {
+  flex: 1;
+  padding: 5px 6px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-elevated);
+  color: var(--text-secondary);
+  border-radius: var(--radius-ctl, 4px);
+  cursor: pointer;
+  font-size: 11px;
+}
+.tk-brokers button.active, .tk-types button.active, .tk-acct-tabs button.active { color: var(--text-strong); border-color: var(--accent); background: var(--bg-active); }
+.tk-symbol { display: flex; justify-content: space-between; color: var(--text-secondary); }
+.tk-symbol b { color: var(--text-strong); }
+.tk-sides button {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-ctl, 4px);
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  opacity: 0.45;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.tk-sides button small { font-weight: 500; font-family: var(--font-mono); }
+.tk-sides button.active { opacity: 1; }
+.tk-buy { background: var(--bull); }
+.tk-sell { background: var(--bear); }
+.tk-field { display: flex; justify-content: space-between; align-items: center; gap: 8px; color: var(--text-secondary); }
+.tk-field input, .tk-brackets input, .tk-pct input, .tk-bracket-edit input, .tk-reset input {
+  width: 120px;
+  padding: 4px 6px;
+  background: var(--bg-canvas);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 3px;
+  font-family: var(--font-mono);
+}
+.tk-brackets { display: grid; grid-template-columns: auto 1fr; gap: 6px 8px; align-items: center; }
+.tk-brackets input { width: 100%; }
+.tk-pct { grid-column: 1 / -1; display: flex; align-items: center; gap: 4px; color: var(--text-secondary); }
+.tk-pct input { width: 56px; }
+.tk-check { display: flex; align-items: center; gap: 6px; color: var(--text-secondary); cursor: pointer; white-space: nowrap; }
+.tk-account .btn-secondary, .tk-account td { white-space: nowrap; }
+.tk-link { align-self: flex-end; border: 0; background: none; color: var(--accent); cursor: pointer; font-size: 11px; padding: 0; }
+.tk-summary { display: flex; justify-content: space-between; color: var(--text-secondary); }
+.tk-summary b { color: var(--text-strong); font-family: var(--font-mono); }
+.tk-send { padding: 9px; border: 0; border-radius: var(--radius-ctl, 4px); color: #fff; font-weight: 700; cursor: pointer; }
+.tk-send:disabled { opacity: 0.5; cursor: not-allowed; }
+.tk-errors { color: var(--bear); font-size: 11px; }
+.tk-warn { color: var(--amber); font-size: 11px; }
+.tk-note, .tk-muted { color: var(--text-secondary); font-size: 11px; }
+.tk-sub { color: var(--text-secondary); font-weight: 700; font-size: 11px; margin-top: 4px; }
+.tk-box { display: flex; flex-direction: column; gap: 6px; padding: 8px; border: 1px solid var(--border-color); border-radius: var(--radius-box, 6px); }
+.tk-row { display: flex; justify-content: space-between; align-items: center; }
+.tk-mini { font-size: 11px; }
+.tk-env-test { color: var(--amber); }
+.tk-env-live { color: var(--bear); }
+
+/* ---------- Binance onay penceresi ---------- */
+.tk-modal-backdrop { position: fixed; inset: 0; z-index: 4000; background: rgba(0, 0, 0, 0.55); display: flex; align-items: center; justify-content: center; }
+.tk-modal { width: min(440px, calc(100vw - 32px)); background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: var(--shadow-pop); }
+.tk-modal-title { padding: 12px 14px; font-weight: 700; color: var(--text-strong); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; }
+.tk-modal-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.tk-sum { font-weight: 700; color: var(--text-strong); }
+.tk-params { font-family: var(--font-code, monospace); font-size: 10.5px; word-break: break-all; color: var(--text-secondary); background: var(--bg-canvas); padding: 6px; border-radius: 4px; }
+.tk-modal-actions { padding: 10px 14px; display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid var(--border-color); }
+
+/* ---------- paper hesap paneli ---------- */
+.tk-account { flex-direction: column; gap: 6px; }
+.tk-account.active { display: flex; }
+.tk-acct-head { display: flex; flex-wrap: wrap; gap: 6px 18px; font-family: var(--font-mono); color: var(--text-secondary); }
+.tk-acct-head b { color: var(--text-strong); }
+.tk-acct-tabs { max-width: 520px; }
+.tk-acct-body { flex: 1; overflow: auto; }
+.tk-account .pos, .tk-acct-head .pos { color: var(--bull); }
+.tk-account .neg, .tk-acct-head .neg { color: var(--bear); }
+.tk-actions { display: flex; gap: 4px; white-space: nowrap; }
+.tk-sym { cursor: pointer; color: var(--accent); font-weight: 700; }
+.tk-bracket-edit, .tk-reset { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 0; }
+.tk-bracket-edit label, .tk-reset label { display: flex; align-items: center; gap: 6px; color: var(--text-secondary); }

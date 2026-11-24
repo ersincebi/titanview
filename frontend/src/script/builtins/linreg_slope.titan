@@ -1,0 +1,11 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Doğrusal Regresyon Eğimi
+// @category trend
+// @desc Regresyon doğrusunun bar başına eğimi
+indicator("Linear Regression Slope", "LRS", overlay=false, format=format.price, precision=4)
+length = input.int(14, "Length", minval=2)
+src = input(close, "Source")
+slope = ta.linreg(src, length, 0) - ta.linreg(src, length, 1)
+plot(slope, "Slope", color=slope >= 0 ? #089981 : #F23645, style=plot.style_columns)
+hline(0, "Zero", color=#787B86)

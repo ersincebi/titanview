@@ -1,0 +1,74 @@
+name: ci
+on:
+  push:
+  pull_request:
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+      - run: cd backend && go vet ./... && go test -race -cover ./...
+      - name: fuzz (kısa)
+        run: |
+          cd backend
+          go test ./internal/normalizer -run '^$' -fuzz '^FuzzNormalizeYahooChart$' -fuzztime 10s
+          go test ./internal/storage -run '^$' -fuzz '^FuzzComputeMissingGaps$' -fuzztime 10s
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: builtins lisans ve köken kontrolü
+        run: node scripts/check-licenses.mjs
+      - run: pnpm typecheck
+      - run: pnpm coverage
+      - run: pnpm build
+  compliance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+      - uses: dtolnay/rust-toolchain@stable
+      - run: pnpm install --frozen-lockfile
+      - name: Install go-licenses
+        run: go install github.com/google/go-licenses/v2@latest
+      - name: License & clean-room audit (npm, Go, Rust, builtins)
+        run: PATH="$HOME/go/bin:$PATH" node scripts/check-licenses.mjs --require-go --require-rust
+      - name: Secret scan (gitleaks)
+        run: |
+          VER=8.24.2
+          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${VER}/gitleaks_${VER}_linux_x64.tar.gz" | tar -xz -C /tmp gitleaks
+          /tmp/gitleaks git --redact --no-banner -v .
+  smoke:
+    needs: [backend, frontend, compliance]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: scripts/smoke.sh

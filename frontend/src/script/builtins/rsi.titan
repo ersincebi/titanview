@@ -1,0 +1,21 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Göreceli Güç Endeksi
+// @category osc
+// @desc Kazanç/kayıp oranına dayalı momentum (0–100)
+indicator("Relative Strength Index", "RSI", overlay=false, format=format.price, precision=2)
+period = input.int(14, "RSI Length", minval=1, group="RSI Settings")
+price = input.source(close, "Source", group="RSI Settings")
+maKind = input.string("SMA", "MA Type", options=["None", "SMA", "EMA", "SMMA (RMA)", "WMA", "VWMA"], group="MA Settings", display=display.data_window)
+maLen = input.int(14, "MA Length", minval=1, group="MA Settings", display=display.data_window)
+delta = price - price[1]
+avgGain = ta.rma(math.max(delta, 0.0), period)
+avgLoss = ta.rma(math.max(-delta, 0.0), period)
+rsiVal = avgLoss == 0 ? 100.0 : avgGain == 0 ? 0.0 : 100.0 - 100.0 / (1.0 + avgGain / avgLoss)
+maVal = maKind == "None" ? na : maKind == "EMA" ? ta.ema(rsiVal, maLen) : maKind == "SMMA (RMA)" ? ta.rma(rsiVal, maLen) : maKind == "WMA" ? ta.wma(rsiVal, maLen) : maKind == "VWMA" ? ta.vwma(rsiVal, maLen) : ta.sma(rsiVal, maLen)
+plot(rsiVal, "RSI", color=#8B5CF6)
+plot(maVal, "RSI-based MA", color=#F59E0B)
+hiBand = hline(70, "RSI Upper Band", color=#64748B)
+hline(50, "RSI Middle Band", color=color.new(#64748B, 50))
+loBand = hline(30, "RSI Lower Band", color=#64748B)
+fill(hiBand, loBand, color=color.new(#8B5CF6, 90), title="RSI Background Fill")

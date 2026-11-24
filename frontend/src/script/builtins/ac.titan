@@ -1,0 +1,15 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Hızlandırıcı Osilatör
+// @category osc
+// @desc AO − SMA(AO,5)
+indicator("Accelerator Oscillator", "AC", overlay=false)
+fastLen = input.int(5, "Fast Period", minval=1)
+slowLen = input.int(34, "Slow Period", minval=1)
+sigLen = input.int(5, "Signal Period", minval=1)
+midPrice = (high + low) / 2
+awesome = ta.sma(midPrice, fastLen) - ta.sma(midPrice, slowLen)
+accel = awesome - ta.sma(awesome, sigLen)
+barCol = accel > accel[1] ? #089981 : #F23645
+plot(accel, "AC", style=plot.style_columns, color=barCol)
+hline(0, "Zero", color=#64748B)

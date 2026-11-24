@@ -1,0 +1,11 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Pazar Kolaylaştırma Endeksi
+// @category volume
+// @desc Bill Williams (yüksek−düşük)/hacim
+indicator("Market Facilitation Index", "BW MFI", overlay=false, format=format.price, precision=6)
+mfi = (high - low) / volume
+mfiUp = mfi > mfi[1]
+volUp = volume > volume[1]
+col = mfiUp and volUp ? #089981 : not mfiUp and not volUp ? #A1887F : mfiUp and not volUp ? #0284C7 : #E040FB
+plot(mfi, "MFI", style=plot.style_columns, color=col)

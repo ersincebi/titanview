@@ -1,0 +1,10 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Elder Kuvvet Endeksi
+// @category osc
+// @desc Fiyat değişimi × hacim EMA'sı
+indicator("Elder Force Index", "EFI", overlay=false, format=format.volume)
+period = input.int(13, "Length", minval=1)
+rawForce = (close - close[1]) * volume
+plot(ta.ema(rawForce, period), "Elder Force Index", color=#F23645)
+hline(0, "Zero", color=#64748B)

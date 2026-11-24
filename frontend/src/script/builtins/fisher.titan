@@ -1,0 +1,23 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Fisher Dönüşümü
+// @category osc
+// @desc Fiyatı Gauss dağılımına dönüştürür
+indicator("Fisher Transform", "Fisher", overlay=false, format=format.price, precision=2)
+period = input.int(9, "Length", minval=1)
+mid = (high + low) / 2.0
+hiN = ta.highest(mid, period)
+loN = ta.lowest(mid, period)
+var float normVal = 0.0
+raw = hiN != loN ? 2.0 * ((mid - loN) / (hiN - loN) - 0.5) : 0.0
+blended = 0.33 * raw + 0.67 * nz(normVal[1])
+normVal := math.max(-0.999, math.min(0.999, blended))
+var float fisher = 0.0
+fisher := 0.5 * math.log((1.0 + normVal) / (1.0 - normVal)) + 0.5 * nz(fisher[1])
+hline(1.5, "1.5", color=#E11D48)
+hline(0.75, "0.75", color=#64748B)
+hline(0.0, "0", color=#E11D48)
+hline(-0.75, "-0.75", color=#64748B)
+hline(-1.5, "-1.5", color=#E11D48)
+plot(fisher, "Fisher", color=#0284C7)
+plot(fisher[1], "Trigger", color=#F59E0B)

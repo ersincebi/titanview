@@ -1,0 +1,17 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Medyan
+// @category ma
+// @desc Medyan fiyat ve ATR bantları
+indicator("Median", "Median", overlay=true)
+price = input.source(hl2, "Median Source")
+medLen = input.int(3, "Median Length", minval=1)
+atrLen = input.int(14, "ATR Length", minval=1)
+mult = input.float(2.0, "ATR Multiplier", step=0.1)
+medVal = ta.percentile_nearest_rank(price, medLen, 50)
+band = mult * ta.atr(atrLen)
+uPlot = plot(medVal + band, "Upper Band", color=#0D9488)
+plot(medVal, "Median", color=#EF4444, linewidth=3)
+lPlot = plot(medVal - band, "Lower Band", color=#0D9488)
+plot(ta.ema(medVal, medLen), "Median EMA", color=#0284C7)
+fill(uPlot, lPlot, color=color.new(#0D9488, 90), title="Background")

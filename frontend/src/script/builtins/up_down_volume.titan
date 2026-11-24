@@ -1,0 +1,19 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Yukarı/Aşağı Hacim
+// @category volume
+// @desc Alt zaman dilimi barlarına göre alış/satış hacmi
+indicator("Up/Down Volume", "Up/Down Vol", overlay=false, format=format.volume)
+lowerTf = timeframe.isseconds ? "1S" : timeframe.isintraday ? "1" : timeframe.isdaily ? "5" : "60"
+upVol() =>
+    close >= open ? volume : 0.0
+downVol() =>
+    close < open ? -volume : 0.0
+upArr = request.security_lower_tf(syminfo.tickerid, lowerTf, upVol())
+downArr = request.security_lower_tf(syminfo.tickerid, lowerTf, downVol())
+upV = array.size(upArr) > 0 ? array.sum(upArr) : (close >= open ? volume : 0)
+dnV = array.size(downArr) > 0 ? array.sum(downArr) : (close < open ? -volume : 0)
+delta = upV + dnV
+plot(upV, "Up Volume", style=plot.style_columns, color=color.new(#089981, 40))
+plot(dnV, "Down Volume", style=plot.style_columns, color=color.new(#F23645, 40))
+plot(delta, "Delta", style=plot.style_columns, color=delta >= 0 ? #089981 : #F23645)

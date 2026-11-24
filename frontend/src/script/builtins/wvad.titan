@@ -1,0 +1,7 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Williams Değişken Birikim/Dağılım
+// @category volume
+// @desc Gövde/aralık × hacim
+indicator("Williams Variable Accumulation/Distribution", "WVAD", overlay=false, format=format.volume)
+plot(ta.wvad, "WVAD", color=#0284C7, style=plot.style_columns)

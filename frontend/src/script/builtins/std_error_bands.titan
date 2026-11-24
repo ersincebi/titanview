@@ -1,0 +1,19 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Standart Hata Bantları
+// @category volatility
+// @desc Regresyon ± k·standart hata
+indicator("Standard Error Bands", "SEB", overlay=true)
+length = input.int(21, "Length", minval=3)
+mult = input.float(2.0, "Multiplier")
+smooth = input.int(3, "Smoothing", minval=1)
+src = input(close, "Source")
+lr = ta.linreg(src, length, 0)
+err = src - lr
+se = math.sqrt(math.sum(err * err, length) / (length - 2))
+mid = ta.sma(lr, smooth)
+band = ta.sma(se, smooth) * mult
+u = plot(mid + band, "Upper", color=#F23645)
+plot(mid, "Middle", color=#0284C7)
+l = plot(mid - band, "Lower", color=#089981)
+fill(u, l, color=color.rgb(33, 150, 243, 95), title="Background")

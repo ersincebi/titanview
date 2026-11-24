@@ -1,0 +1,14 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Hareketli Ortalama (Tür Seçmeli)
+// @category ma
+// @desc SMA/EMA/RMA/WMA/VWMA arasında seçim + düzleştirme
+indicator("Moving Average", "MA", overlay=true)
+period = input.int(20, "Length", minval=1)
+price = input.source(close, "Source")
+kind = input.string("SMA", "Method", options=["SMA", "EMA", "SMMA (RMA)", "WMA", "VWMA"])
+smooth = input.int(1, "Smoothing Length", minval=1)
+calcMa(float s, simple int n, string k) =>
+    k == "EMA" ? ta.ema(s, n) : k == "SMMA (RMA)" ? ta.rma(s, n) : k == "WMA" ? ta.wma(s, n) : k == "VWMA" ? ta.vwma(s, n) : ta.sma(s, n)
+baseVal = calcMa(price, period, kind)
+plot(smooth > 1 ? ta.sma(baseVal, smooth) : baseVal, "MA", color=#0284C7)

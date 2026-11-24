@@ -1,0 +1,24 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Volatilite Durağı
+// @category trend
+// @desc ATR katlı dönüş stopu
+indicator("Volatility Stop", "VStop", overlay=true)
+period = input.int(20, "Length", minval=2)
+price = input.source(close, "Source")
+mult = input.float(2.0, "Multiplier", minval=0.25, step=0.25)
+var float peak = na
+var float trough = na
+var bool bull = true
+var float trail = na
+band = nz(ta.atr(period) * mult, ta.tr)
+peak := na(peak) ? price : math.max(peak, price)
+trough := na(trough) ? price : math.min(trough, price)
+trail := na(trail) ? (bull ? peak - band : trough + band) : (bull ? math.max(trail, peak - band) : math.min(trail, trough + band))
+nextBull = price >= trail
+if nextBull != bull
+    bull := nextBull
+    peak := price
+    trough := price
+    trail := bull ? price - band : price + band
+plot(trail, "Volatility Stop", style=plot.style_cross, color=bull ? #089981 : #F23645)

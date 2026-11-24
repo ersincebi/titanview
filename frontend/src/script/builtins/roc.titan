@@ -1,0 +1,11 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Değişim Oranı
+// @category osc
+// @desc Yüzde değişim (N bar)
+indicator("Rate Of Change", "ROC", overlay=false, format=format.price, precision=2)
+period = input.int(9, "Length", minval=1)
+price = input.source(close, "Source")
+rocVal = 100.0 * (price - price[period]) / price[period]
+plot(rocVal, "ROC", color=#0284C7)
+hline(0, "Zero Line", color=#64748B)

@@ -1,0 +1,11 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Bollinger Barları
+// @category volatility
+// @desc Bant dışı kapanışları renklendirir
+indicator("Bollinger Bars", "BB Bars", overlay=true)
+length = input.int(20, "Length", minval=1)
+mult = input.float(2.0, "StdDev")
+[basis, upper, lower] = ta.bb(close, length, mult)
+barcolor(close > upper ? #089981 : close < lower ? #F23645 : na)
+plot(basis, "Basis", color=color.new(#0284C7, 60))

@@ -1,0 +1,18 @@
+[package]
+name = "titan-core"
+version = "0.1.0"
+edition = "2021"
+license = "AGPL-3.0-or-later"
+description = "TitanView TitanScript VM sıcak yolu: ta.* artımlı çekirdekleri (WASM)"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+
+[profile.release]
+opt-level = 3
+lto = true
+panic = "abort"
+codegen-units = 1
+strip = true

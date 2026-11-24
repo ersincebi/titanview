@@ -1,0 +1,62 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Otomatik Fib Geri Çekilme
+// @category auto
+// @desc Son belirgin salınıma göre Fibonacci seviyeleri
+indicator("Auto Fib Retracement", "Auto Fib", overlay=true, max_lines_count=50, max_labels_count=50)
+devThreshold = input.float(3.0, "Deviation (%)", minval=0.1, step=0.1)
+depth = input.int(10, "Depth", minval=2)
+reverse = input.bool(false, "Reverse")
+extendLeft = input.bool(false, "Extend Left")
+extendRight = input.bool(true, "Extend Right")
+showPrices = input.bool(true, "Show Prices")
+var float p1 = na
+var int b1 = na
+var float p2 = na
+var int b2 = na
+var bool lastHigh = false
+ph = ta.pivothigh(high, depth, depth)
+pl = ta.pivotlow(low, depth, depth)
+if not na(ph)
+    if na(p2) or (lastHigh and ph > p2)
+        p2 := ph
+        b2 := bar_index - depth
+        lastHigh := true
+    else if not lastHigh and math.abs(ph - p2) / p2 * 100 >= devThreshold
+        p1 := p2
+        b1 := b2
+        p2 := ph
+        b2 := bar_index - depth
+        lastHigh := true
+if not na(pl)
+    if na(p2) or (not lastHigh and pl < p2)
+        p2 := pl
+        b2 := bar_index - depth
+        lastHigh := false
+    else if lastHigh and math.abs(pl - p2) / p2 * 100 >= devThreshold
+        p1 := p2
+        b1 := b2
+        p2 := pl
+        b2 := bar_index - depth
+        lastHigh := false
+var array<line> ls = array.new<line>()
+var array<label> lb = array.new<label>()
+if barstate.islast and not na(p1)
+    for l in ls
+        line.delete(l)
+    for x in lb
+        label.delete(x)
+    array.clear(ls)
+    array.clear(lb)
+    levels = array.from(0.0, 0.236, 0.382, 0.5, 0.618, 0.786, 1.0, 1.618, 2.618, 3.618, 4.236)
+    cols = array.from(#787B86, #F23645, #FF9800, #4CAF50, #089981, #00BCD4, #787B86, #0284C7, #F23645, #9C27B0, #E91E63)
+    startP = reverse ? p1 : p2
+    endP = reverse ? p2 : p1
+    ext = extendLeft and extendRight ? extend.both : extendLeft ? extend.left : extendRight ? extend.right : extend.none
+    for i = 0 to array.size(levels) - 1
+        lv = array.get(levels, i)
+        price = startP + (endP - startP) * lv
+        c = array.get(cols, i)
+        array.push(ls, line.new(b1, price, bar_index, price, color=c, extend=ext))
+        array.push(lb, label.new(b1, price, str.tostring(lv) + (showPrices ? " (" + str.tostring(price, format.mintick) + ")" : ""), style=label.style_none, textcolor=c, size=size.small))
+    array.push(ls, line.new(b1, p1, b2, p2, color=color.new(#787B86, 30), style=line.style_dashed))

@@ -1,0 +1,12 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Hacim Deltası
+// @category volume
+// @desc Alt zaman dilimine göre bar başına alış−satış hacmi
+indicator("Volume Delta", "Vol Δ", overlay=false, format=format.volume)
+lowerTf = timeframe.isseconds ? "1S" : timeframe.isintraday ? "1" : timeframe.isdaily ? "5" : "60"
+barDelta() =>
+    close > open ? volume : close < open ? -volume : 0.0
+deltas = request.security_lower_tf(syminfo.tickerid, lowerTf, barDelta())
+d = array.size(deltas) > 0 ? array.sum(deltas) : (close > open ? volume : close < open ? -volume : 0.0)
+plot(d, "Volume Delta", style=plot.style_columns, color=d >= 0 ? #089981 : #F23645)

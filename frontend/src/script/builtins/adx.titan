@@ -1,0 +1,19 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Ortalama Yönsel Endeks
+// @category trend
+// @desc Trend gücü (yönden bağımsız)
+indicator("Average Directional Index", "ADX", overlay=false, format=format.price, precision=2)
+smoothLen = input.int(14, "ADX Smoothing", minval=1)
+diPeriod = input.int(14, "DI Length", minval=1)
+upMove = high - high[1]
+dnMove = low[1] - low
+posDm = na(upMove) ? na : (upMove > dnMove and upMove > 0 ? upMove : 0.0)
+negDm = na(dnMove) ? na : (dnMove > upMove and dnMove > 0 ? dnMove : 0.0)
+trSmooth = ta.rma(ta.tr, diPeriod)
+diPlus = fixnan(100.0 * ta.rma(posDm, diPeriod) / trSmooth)
+diMinus = fixnan(100.0 * ta.rma(negDm, diPeriod) / trSmooth)
+diSum = diPlus + diMinus
+dxVal = 100.0 * math.abs(diPlus - diMinus) / (diSum == 0 ? 1.0 : diSum)
+adxVal = ta.rma(dxVal, smoothLen)
+plot(adxVal, "ADX", color=#F23645)

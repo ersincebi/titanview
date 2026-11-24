@@ -1,0 +1,13 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Hareketli Ortalama Kanalı
+// @category ma
+// @desc Yüksek ve düşük fiyatların SMA kanalı
+indicator("Moving Average Channel", "MAC", overlay=true)
+upperLength = input.int(20, "Upper Length", minval=1)
+lowerLength = input.int(20, "Lower Length", minval=1)
+upperOffset = input.int(0, "Upper Offset")
+lowerOffset = input.int(0, "Lower Offset")
+u = plot(ta.sma(high, upperLength), "Upper", color=#0284C7, offset=upperOffset)
+l = plot(ta.sma(low, lowerLength), "Lower", color=#0284C7, offset=lowerOffset)
+fill(u, l, color=color.rgb(33, 150, 243, 95), title="Background")

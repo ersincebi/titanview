@@ -1,0 +1,10 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Negatif Hacim Endeksi
+// @category volume
+// @desc Hacmin düştüğü günlerdeki fiyat değişimi
+indicator("Negative Volume Index", "NVI", overlay=false)
+emaLen = input.int(255, "EMA Length", minval=1)
+nvi = ta.nvi
+plot(nvi, "NVI", color=#0284C7)
+plot(ta.ema(nvi, emaLen), "NVI EMA", color=#FF6D00)

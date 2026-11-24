@@ -1,0 +1,30 @@
+# Self-hosted TitanView with Docker Compose.
+# App listens on 127.0.0.1 only; expose via reverse proxy or optional Cloudflare Tunnel
+# (place credentials in ./cloudflared, which is gitignored).
+#   docker compose up -d --build
+name: titanview
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8098:8080"
+    environment:
+      # Cloudflare Access. Both set = every request must carry a valid Access JWT.
+      CF_ACCESS_TEAM: ${CF_ACCESS_TEAM:-}
+      CF_ACCESS_AUD: ${CF_ACCESS_AUD:-}
+      CF_ACCESS_EMAILS: ${CF_ACCESS_EMAILS:-}
+    volumes:
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD", "/app/titanview-server", "--healthcheck"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate --config /etc/cloudflared/config.yml run
+    volumes:
+      - ./cloudflared:/etc/cloudflared:ro
+    depends_on: [app]

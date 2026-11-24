@@ -1,0 +1,11 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Williams Fraktalları
+// @category trend
+// @desc Beş barlık tepe ve dip fraktalları
+indicator("Williams Fractals", "Fractals", overlay=true, format=format.price, precision=0)
+wing = input.int(2, "Periods", minval=2)
+isTop = not na(ta.pivothigh(high, wing, wing))
+isBot = not na(ta.pivotlow(low, wing, wing))
+plotshape(isBot, "Down Fractal", style=shape.triangleup, location=location.belowbar, offset=-wing, color=#F23645, size=size.small)
+plotshape(isTop, "Up Fractal", style=shape.triangledown, location=location.abovebar, offset=-wing, color=#089981, size=size.small)

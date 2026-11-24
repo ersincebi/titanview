@@ -1,0 +1,16 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Williams %R
+// @category osc
+// @desc Kapanışın en yüksek-en düşük aralığındaki yeri (−100..0)
+indicator("Williams Percent Range", "Williams %R", overlay=false, format=format.price, precision=2)
+period = input.int(14, "Length", minval=1)
+price = input.source(close, "Source")
+hiN = ta.highest(high, period)
+loN = ta.lowest(low, period)
+wrVal = -100.0 * (hiN - price) / (hiN - loN)
+hiLine = hline(-20, "Upper Band", color=#64748B)
+hline(-50, "Middle Level", color=#64748B, linestyle=hline.style_dotted)
+loLine = hline(-80, "Lower Band", color=#64748B)
+fill(hiLine, loLine, color=color.new(#8B5CF6, 90), title="Background")
+plot(wrVal, "%R", color=#8B5CF6)

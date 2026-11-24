@@ -1,0 +1,18 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Pivot Noktaları Yüksek Düşük
+// @category auto
+// @desc Sol/sağ bar sayısına göre tepe ve dip pivotları
+indicator("Pivot Points High Low", "Pivots HL", overlay=true, max_labels_count=500)
+hiLeft = input.int(10, "Pivot High Left", minval=1)
+hiRight = input.int(10, "Pivot High Right", minval=1)
+hiCol = input.color(#F23645, "Pivot High Color")
+loLeft = input.int(10, "Pivot Low Left", minval=1)
+loRight = input.int(10, "Pivot Low Right", minval=1)
+loCol = input.color(#089981, "Pivot Low Color")
+topVal = ta.pivothigh(high, hiLeft, hiRight)
+botVal = ta.pivotlow(low, loLeft, loRight)
+if not na(topVal)
+    label.new(bar_index - hiRight, topVal, str.tostring(topVal, format.mintick), color=color.new(color.white, 100), textcolor=hiCol, style=label.style_label_down)
+if not na(botVal)
+    label.new(bar_index - loRight, botVal, str.tostring(botVal, format.mintick), color=color.new(color.white, 100), textcolor=loCol, style=label.style_label_up)

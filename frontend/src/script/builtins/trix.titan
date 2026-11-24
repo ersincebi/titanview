@@ -1,0 +1,12 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr TRIX
+// @category osc
+// @desc Üçlü EMA logaritmik değişimi
+indicator("TRIX", "TRIX", overlay=false, format=format.price, precision=2)
+period = input.int(18, "Length", minval=1)
+e1 = ta.ema(math.log(close), period)
+e2 = ta.ema(e1, period)
+e3 = ta.ema(e2, period)
+plot(10000.0 * (e3 - e3[1]), "TRIX", color=#F23645)
+hline(0, "Zero", color=#64748B)

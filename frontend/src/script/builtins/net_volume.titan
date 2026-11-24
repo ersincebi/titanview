@@ -1,0 +1,8 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Net Hacim
+// @category volume
+// @desc Yukarı barların hacmi − aşağı barların hacmi
+indicator("Net Volume", "Net Volume", overlay=false, format=format.volume)
+nv = ta.change(close) > 0 ? volume : ta.change(close) < 0 ? -volume : 0 * volume
+plot(nv, "Net Volume", color=#0284C7, style=plot.style_columns)

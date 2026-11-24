@@ -1,0 +1,10 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Fark (Spread)
+// @category other
+// @desc İki sembolün kapanış farkı
+indicator("Spread", "Spread", overlay=false)
+symbolInput = input.symbol("XU100.IS", "Second Symbol")
+other = request.security(symbolInput, timeframe.period, close)
+plot(close - other, "Spread", color=#0284C7, style=plot.style_area)
+hline(0, "Zero", color=#787B86)

@@ -1,0 +1,10 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr En Küçük Kareler Hareketli Ortalama
+// @category ma
+// @desc Doğrusal regresyon eğrisi
+indicator("Least Squares Moving Average", "LSMA", overlay=true)
+period = input.int(25, "Length", minval=1)
+shift = input.int(0, "Offset")
+price = input.source(close, "Source")
+plot(ta.linreg(price, period, shift), "LSMA", color=#0284C7)

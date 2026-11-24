@@ -1,0 +1,10 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Trend Güç Endeksi
+// @category osc
+// @desc Kapanışın bar indeksiyle korelasyonu
+indicator("Trend Strength Index", "TSI", overlay=false, format=format.price, precision=4)
+length = input.int(14, "Length", minval=2)
+tsi = ta.correlation(close, bar_index, length)
+plot(tsi, "Trend Strength Index", color=tsi >= 0 ? #089981 : #F23645, style=plot.style_columns)
+hline(0, "Zero", color=#787B86)

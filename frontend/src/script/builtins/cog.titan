@@ -1,0 +1,11 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Ağırlık Merkezi
+// @category osc
+// @desc Ehlers ağırlık merkezi osilatörü
+indicator("Center of Gravity", "COG", overlay=false)
+length = input.int(10, "Length", minval=1)
+src = input(hl2, "Source")
+cog = ta.cog(src, length)
+plot(cog, "COG", color=#0284C7)
+plot(cog[1], "Trigger", color=#FF6D00)

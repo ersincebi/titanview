@@ -1,0 +1,13 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Trendden Arındırılmış Fiyat Osilatörü
+// @category osc
+// @desc Fiyatın kaydırılmış SMA'dan farkı
+indicator("Detrended Price Oscillator", "DPO", overlay=false)
+period = input.int(21, "Length", minval=1)
+centered = input.bool(false, "Centered")
+lagBars = math.round(period / 2.0 + 1.0)
+smaVal = ta.sma(close, period)
+dpoVal = centered ? close[lagBars] - smaVal : close - smaVal[lagBars]
+plot(dpoVal, "Detrended Price Oscillator", offset=centered ? -lagBars : 0, color=#16A34A)
+hline(0, "Zero Line", color=#64748B)

@@ -1,0 +1,16 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Beyaz Marubozu
+// @category pattern
+// @desc Mum formasyonu — boğa (yükseliş) sinyali (MW)
+indicator("Marubozu White", "MW", overlay=true)
+bodyTop = math.max(open, close)
+bodyBot = math.min(open, close)
+bodySize = bodyTop - bodyBot
+upperWick = high - bodyTop
+lowerWick = bodyBot - low
+avgBody = ta.ema(bodySize, 14)
+isLong = bodySize > avgBody
+isBull = close > open
+detected = isBull and isLong and upperWick <= bodySize * 0.05 and lowerWick <= bodySize * 0.05
+plotshape(detected, "Marubozu White", style=shape.labelup, location=location.belowbar, color=color.new(#089981, 0), text="MW", textcolor=color.white, size=size.small)

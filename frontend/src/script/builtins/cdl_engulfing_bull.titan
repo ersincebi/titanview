@@ -1,0 +1,20 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Yutan Boğa
+// @category pattern
+// @desc Mum formasyonu — boğa (yükseliş) sinyali (BE)
+indicator("Engulfing - Bullish", "BE", overlay=true)
+trendMode = input.string("SMA50", "Detect Trend Based On", options=["SMA50", "SMA50, SMA200", "No detection"])
+sma50 = ta.sma(close, 50)
+sma200 = ta.sma(close, 200)
+inDowntrend = trendMode == "No detection" ? true : trendMode == "SMA50" ? close < sma50 : close < sma50 and sma50 < sma200
+bodyTop = math.max(open, close)
+bodyBot = math.min(open, close)
+bodySize = bodyTop - bodyBot
+avgBody = ta.ema(bodySize, 14)
+isSmall = bodySize < avgBody
+isLong = bodySize > avgBody
+isBull = close > open
+isBear = close < open
+detected = inDowntrend and isBull and isLong and isBear[1] and isSmall[1] and close >= open[1] and open <= close[1] and (close > open[1] or open < close[1])
+plotshape(detected, "Engulfing - Bullish", style=shape.labelup, location=location.belowbar, color=color.new(#089981, 0), text="BE", textcolor=color.white, size=size.small)

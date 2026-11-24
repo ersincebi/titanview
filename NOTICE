@@ -1,0 +1,36 @@
+TitanView
+Copyright (c) 2026 Ersin Çebi
+Licensed under the GNU Affero General Public License v3.0 or later (AGPL-3.0-or-later).
+
+Built-in Indicators (frontend/src/script/builtins/):
+All 194 built-in TitanScript (.titan) indicators in TitanView are clean-room implementations
+derived from published technical analysis literature and are licensed under AGPL-3.0-or-later.
+
+This product includes software developed by third parties:
+
+- Lightweight Charts™ (https://github.com/tradingview/lightweight-charts)
+  Copyright (c) 2025 TradingView, Inc. — Apache License 2.0.
+  Charts are rendered with the open-source Lightweight Charts library;
+  required Apache-2.0 attribution and link are shown in the About dialog.
+- Monaco Editor (https://github.com/microsoft/monaco-editor)
+  Copyright (c) Microsoft Corporation — MIT License.
+- SolidJS (https://github.com/solidjs/solid)
+  Copyright (c) Ryan Carniato — MIT License.
+- Tauri (https://tauri.app)
+  Copyright (c) The Tauri Programme within The Commons Conservancy — MIT / Apache-2.0.
+- Goja (https://github.com/dop251/goja) — MIT License.
+- Gorilla WebSocket (https://github.com/gorilla/websocket) — BSD-2-Clause License.
+- go-sqlite3 (https://github.com/mattn/go-sqlite3) — MIT License.
+- Additional Go modules in backend/go.mod, Rust crates in Cargo.lock files, and npm packages
+  in pnpm-lock.yaml, each governed by its own open-source license.
+
+Trademarks:
+TradingView® and Pine Script® are registered trademarks of TradingView, Inc.
+TitanView is an independent open-source project and is NOT affiliated with, sponsored by,
+or endorsed by TradingView, Inc.
+Binance, Yahoo, Google, Deribit, İş Yatırım, and Borsa İstanbul are trademarks of their respective owners.
+
+Unofficial Third-Party Data Sources:
+Unofficial third-party endpoints (Yahoo Finance, Google News, İş Yatırım) are disabled by default
+and are only contacted after the user explicitly opts in via Settings → Data sources (or the
+TITAN_UNOFFICIAL_SOURCES override) and accepts sole responsibility for third-party terms of use.

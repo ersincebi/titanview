@@ -1,0 +1,26 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Çapalı VWAP
+// @category volume
+// @desc Seçilen zamandan itibaren VWAP (grafikten tıklayarak çapa)
+indicator("Anchored VWAP", "AVWAP", overlay=true)
+anchorTime = input.time(timestamp("2024-01-01 00:00 +0000"), "Anchor", confirm=true)
+src = input(hlc3, "Source")
+mult = input.float(1.0, "Bands Multiplier", step=0.5, minval=0)
+var float sumPV = na
+var float sumV = na
+var float sumPV2 = na
+if time >= anchorTime and na(sumV)
+    sumPV := 0.0
+    sumV := 0.0
+    sumPV2 := 0.0
+if not na(sumV)
+    sumPV += src * volume
+    sumV += volume
+    sumPV2 += volume * src * src
+v = sumV > 0 ? sumPV / sumV : na
+sd = sumV > 0 ? math.sqrt(math.max(sumPV2 / sumV - v * v, 0)) : na
+plot(v, "VWAP", color=#0284C7, linewidth=2)
+u = plot(v + sd * mult, "Upper Band", color=color.new(#089981, 30))
+l = plot(v - sd * mult, "Lower Band", color=color.new(#089981, 30))
+fill(u, l, color=color.new(#089981, 94), title="Bands Fill")

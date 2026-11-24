@@ -1,0 +1,13 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Aroon
+// @category osc
+// @desc Son tepe/dip'ten bu yana geçen bar yüzdesi
+indicator("Aroon", "Aroon", overlay=false)
+period = input.int(14, "Length", minval=1)
+barsSinceHigh = -ta.highestbars(high, period + 1)
+barsSinceLow = -ta.lowestbars(low, period + 1)
+aroonUp = 100.0 * (period - barsSinceHigh) / period
+aroonDn = 100.0 * (period - barsSinceLow) / period
+plot(aroonUp, "Aroon Up", color=#F59E0B)
+plot(aroonDn, "Aroon Down", color=#0284C7)

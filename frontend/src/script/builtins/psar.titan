@@ -1,0 +1,10 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Parabolik SAR
+// @category trend
+// @desc Durdur ve tersine çevir noktaları
+indicator("Parabolic SAR", "SAR", overlay=true)
+initAf = input.float(0.02, "Start", step=0.01)
+stepAf = input.float(0.02, "Increment", step=0.01)
+maxAf = input.float(0.20, "Max Value", step=0.01)
+plot(ta.sar(initAf, stepAf, maxAf), "ParabolicSAR", style=plot.style_cross, color=#0284C7)

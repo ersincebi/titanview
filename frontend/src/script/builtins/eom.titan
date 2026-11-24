@@ -1,0 +1,13 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Hareket Kolaylığı
+// @category osc
+// @desc Fiyat değişimi / hacim oranı
+indicator("Ease of Movement", "EOM", overlay=false, format=format.volume)
+period = input.int(14, "Length", minval=1)
+scale = input.int(10000, "Divisor", minval=1)
+midMove = (high + low) / 2.0 - (high[1] + low[1]) / 2.0
+boxRatio = volume / (scale * (high - low))
+rawEmv = midMove / boxRatio
+plot(ta.sma(rawEmv, period), "EOM", color=#16A34A)
+hline(0, "Zero", color=#64748B)

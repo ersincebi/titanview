@@ -1,0 +1,15 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Chande Kroll Durağı
+// @category trend
+// @desc ATR'ye dayalı uzun/kısa stoplar
+indicator("Chande Kroll Stop", "CKS", overlay=true)
+p = input.int(10, "ATR Length", minval=1)
+x = input.int(1, "ATR Coefficient", minval=1)
+q = input.int(9, "Stop Length", minval=1)
+first_high_stop = ta.highest(high, p) - x * ta.atr(p)
+first_low_stop = ta.lowest(low, p) + x * ta.atr(p)
+stop_short = ta.highest(first_high_stop, q)
+stop_long = ta.lowest(first_low_stop, q)
+plot(stop_long, "Stop Long", color=#0284C7)
+plot(stop_short, "Stop Short", color=#FF6D00)

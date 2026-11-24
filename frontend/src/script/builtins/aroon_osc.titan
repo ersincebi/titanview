@@ -1,0 +1,14 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Aroon Osilatörü
+// @category osc
+// @desc Aroon Up − Aroon Down
+indicator("Aroon Oscillator", "Aroon Osc", overlay=false)
+period = input.int(14, "Length", minval=1)
+aroonUp = 100.0 * (period + ta.highestbars(high, period + 1)) / period
+aroonDn = 100.0 * (period + ta.lowestbars(low, period + 1)) / period
+diff = aroonUp - aroonDn
+plot(diff, "Aroon Oscillator", style=plot.style_area, color=diff >= 0 ? #089981 : #F23645)
+hline(90, "Upper", color=#64748B, linestyle=hline.style_dashed)
+hline(0, "Middle", color=#64748B)
+hline(-90, "Lower", color=#64748B, linestyle=hline.style_dashed)

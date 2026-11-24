@@ -1,0 +1,13 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Düşen Pencere
+// @category pattern
+// @desc Mum formasyonu — ayı (düşüş) sinyali (FW)
+indicator("Falling Window", "FW", overlay=true)
+trendMode = input.string("SMA50", "Detect Trend Based On", options=["SMA50", "SMA50, SMA200", "No detection"])
+sma50 = ta.sma(close, 50)
+sma200 = ta.sma(close, 200)
+inDowntrend = trendMode == "No detection" ? true : trendMode == "SMA50" ? close < sma50 : close < sma50 and sma50 < sma200
+barRange = high - low
+detected = inDowntrend[1] and barRange > 0 and barRange[1] > 0 and high < low[1]
+plotshape(detected, "Falling Window", style=shape.labeldown, location=location.abovebar, color=color.new(#F23645, 0), text="FW", textcolor=color.white, size=size.small)

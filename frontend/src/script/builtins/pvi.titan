@@ -1,0 +1,10 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Pozitif Hacim Endeksi
+// @category volume
+// @desc Hacmin arttığı günlerdeki fiyat değişimi
+indicator("Positive Volume Index", "PVI", overlay=false)
+emaLen = input.int(255, "EMA Length", minval=1)
+pvi = ta.pvi
+plot(pvi, "PVI", color=#0284C7)
+plot(ta.ema(pvi, emaLen), "PVI EMA", color=#FF6D00)

@@ -1,0 +1,12 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Hacim Osilatörü
+// @category volume
+// @desc Kısa/uzun hacim EMA yüzde farkı
+indicator("Volume Oscillator", "Volume Osc", overlay=false, format=format.percent, precision=2)
+fastLen = input.int(5, "Short Length", minval=1)
+slowLen = input.int(10, "Long Length", minval=1)
+fastVol = ta.ema(volume, fastLen)
+slowVol = ta.ema(volume, slowLen)
+plot(100.0 * (fastVol - slowVol) / slowVol, "Volume Osc", color=#0284C7)
+hline(0, "Zero", color=#64748B)

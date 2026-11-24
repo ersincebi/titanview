@@ -1,0 +1,12 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Vortex Göstergesi
+// @category osc
+// @desc VI+ ve VI− trend başlangıcı
+indicator("Vortex Indicator", "VI", overlay=false, format=format.price, precision=4)
+period = input.int(14, "Length", minval=2)
+vmPlus = math.sum(math.abs(high - low[1]), period)
+vmMinus = math.sum(math.abs(low - high[1]), period)
+trSum = math.sum(ta.tr(true), period)
+plot(vmPlus / trSum, "VI +", color=#0284C7)
+plot(vmMinus / trSum, "VI -", color=#E11D48)

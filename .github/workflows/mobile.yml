@@ -1,0 +1,114 @@
+# Faz 33 — Android (Tauri v2 + süreç içi Go çekirdeği)
+# Her koşu: debug APK (x86_64) emülatörde açılır, ekran görüntüsü + uygulama günlüğü yapıt olarak yüklenir.
+# İmza sırları varsa release APK (arm64-v8a + x86_64) imzalanır; sürüm yayımlanınca sürüme eklenir.
+#   ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD
+# Sır yoksa release adımı uyarıyla atlanır.
+name: mobile
+# Her itişte koşmaz (~25 dk): elle `gh workflow run mobile.yml` ya da sürüm yayımlanınca.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mobile-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  android:
+    name: Android
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+      - name: Android NDK
+        run: |
+          sdkmanager --install "ndk;27.2.12479018" "platforms;android-34" "build-tools;34.0.0" > /dev/null
+          echo "NDK_HOME=$ANDROID_HOME/ndk/27.2.12479018" >> "$GITHUB_ENV"
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,x86_64-linux-android,armv7-linux-androideabi,i686-linux-android
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+          key: android
+
+      - run: pnpm install --frozen-lockfile
+      - name: Android projesi (tauri android init + TitanView ayarları)
+        run: node scripts/android-init.mjs
+
+      - name: Debug APK (emülatör, x86_64)
+        run: pnpm tauri android build --debug --apk --target x86_64
+
+      - name: Release APK (imzalı, arm64-v8a + x86_64)
+        if: env.ANDROID_KEYSTORE_BASE64 != ''
+        run: pnpm tauri android build --apk --target aarch64 x86_64
+      - name: İmza yoksa uyar
+        if: env.ANDROID_KEYSTORE_BASE64 == ''
+        run: echo "::warning::ANDROID_KEYSTORE_BASE64 yok; imzalı release APK atlandı (yalnız debug APK üretildi)"
+
+      - name: APK'ları topla
+        run: |
+          mkdir -p out
+          find src-tauri/gen/android/app/build/outputs/apk -name '*.apk' -print -exec cp {} out/ \;
+          for f in out/*.apk; do mv "$f" "out/TitanView-$(basename "$f" | sed 's/^app-//')"; done
+          (cd out && sha256sum *.apk > SHA256SUMS-android.txt && cat SHA256SUMS-android.txt)
+
+      - name: Emülatör için disk aç
+        run: |
+          rm -rf src-tauri/target src-tauri/gen/android/app/build src-tauri/gen/android/.gradle ~/.gradle/caches node_modules
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/.ghcup /usr/local/share/boost /usr/local/lib/node_modules /opt/hostedtoolcache/CodeQL
+          df -h /
+
+      - name: KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Emülatörde aç, ekran görüntüsü al
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          profile: pixel_6
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: bash scripts/android-emulator-shots.sh out/TitanView-universal-debug.apk out/shots
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: titanview-android
+          path: out/
+          if-no-files-found: warn
+
+      - name: Sürüme ekle (yalnız imzalı release APK)
+        if: github.event_name == 'release' && env.ANDROID_KEYSTORE_BASE64 != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "${{ github.event.release.tag_name }}" out/TitanView-*-release.apk out/SHA256SUMS-android.txt --clobber

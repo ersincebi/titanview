@@ -1,0 +1,19 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Williams Timsah
+// @category trend
+// @desc Kaydırılmış üç SMMA: çene, diş, dudak
+indicator("Williams Alligator", "Alligator", overlay=true)
+jawPeriod = input.int(13, "Jaw Length", minval=1)
+teethPeriod = input.int(8, "Teeth Length", minval=1)
+lipsPeriod = input.int(5, "Lips Length", minval=1)
+jawShift = input.int(8, "Jaw Offset")
+teethShift = input.int(5, "Teeth Offset")
+lipsShift = input.int(3, "Lips Offset")
+medianPx = (high + low) / 2
+jawLine = ta.rma(medianPx, jawPeriod)
+teethLine = ta.rma(medianPx, teethPeriod)
+lipsLine = ta.rma(medianPx, lipsPeriod)
+plot(jawLine, "Jaw", offset=jawShift, color=#0284C7)
+plot(teethLine, "Teeth", offset=teethShift, color=#F23645)
+plot(lipsLine, "Lips", offset=lipsShift, color=#089981)

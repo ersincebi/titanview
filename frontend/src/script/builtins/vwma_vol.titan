@@ -1,0 +1,14 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Hacim Ağırlıklı MACD
+// @category volume
+// @desc VWMA tabanlı MACD
+indicator("Volume Weighted MACD", "VW-MACD", overlay=false)
+fast = input.int(12, "Fast", minval=1)
+slow = input.int(26, "Slow", minval=1)
+sig = input.int(9, "Signal", minval=1)
+m = ta.vwma(close, fast) - ta.vwma(close, slow)
+s = ta.ema(m, sig)
+plot(m - s, "Histogram", style=plot.style_columns, color=m - s >= 0 ? #26A69A : #FF5252)
+plot(m, "VW-MACD", color=#0284C7)
+plot(s, "Signal", color=#FF6D00)

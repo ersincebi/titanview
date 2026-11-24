@@ -1,0 +1,107 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Pivot Noktaları Standart
+// @category auto
+// @desc Geleneksel/Fibonacci/Woodie/Klasik/DM/Camarilla pivotları, otomatik dönem
+indicator("Pivot Points Standard", "Pivots", overlay=true, max_lines_count=500, max_labels_count=500)
+formula = input.string("Traditional", "Type", options=["Traditional", "Fibonacci", "Woodie", "Classic", "DM", "Camarilla"])
+tfChoice = input.string("Auto", "Pivots Timeframe", options=["Auto", "Daily", "Weekly", "Monthly", "Quarterly", "Yearly"])
+keepPeriods = input.int(15, "Number of Pivots Back", minval=1, maxval=200)
+showName = input.bool(true, "Show Labels")
+showVal = input.bool(true, "Show Prices")
+resolvedTf = tfChoice == "Auto" ? (timeframe.isintraday ? (timeframe.multiplier <= 15 ? "1D" : "1W") : timeframe.isdaily ? "1M" : "12M") : tfChoice == "Daily" ? "1D" : tfChoice == "Weekly" ? "1W" : tfChoice == "Monthly" ? "1M" : tfChoice == "Quarterly" ? "3M" : "12M"
+var float prevHi = na
+var float prevLo = na
+var float prevCl = na
+var float prevOp = na
+var float runHi = na
+var float runLo = na
+var float runOp = na
+var int segStart = na
+var array<line> segLines = array.new<line>()
+var array<label> segLabels = array.new<label>()
+emit(string tag, float lvl, int x0, color c) =>
+    if not na(lvl)
+        array.push(segLines, line.new(x0, lvl, bar_index, lvl, color=c, width=1))
+        if showName or showVal
+            caption = (showName ? tag : "") + (showVal ? " (" + str.tostring(lvl, format.mintick) + ")" : "")
+            array.push(segLabels, label.new(x0, lvl, caption, style=label.style_none, textcolor=c, size=size.small))
+if timeframe.change(resolvedTf) or barstate.isfirst
+    prevHi := runHi
+    prevLo := runLo
+    prevCl := close[1]
+    prevOp := runOp
+    runHi := high
+    runLo := low
+    runOp := open
+    segStart := bar_index
+else
+    runHi := math.max(runHi, high)
+    runLo := math.min(runLo, low)
+if not na(prevHi) and bar_index == segStart
+    baseP = (prevHi + prevLo + prevCl) / 3.0
+    rng = prevHi - prevLo
+    float pv = baseP
+    float r1 = na
+    float s1 = na
+    float r2 = na
+    float s2 = na
+    float r3 = na
+    float s3 = na
+    if formula == "Traditional"
+        r1 := 2.0 * pv - prevLo
+        s1 := 2.0 * pv - prevHi
+        r2 := pv + rng
+        s2 := pv - rng
+        r3 := 2.0 * pv + (prevHi - 2.0 * prevLo)
+        s3 := 2.0 * pv - (2.0 * prevHi - prevLo)
+    else if formula == "Fibonacci"
+        r1 := pv + 0.382 * rng
+        s1 := pv - 0.382 * rng
+        r2 := pv + 0.618 * rng
+        s2 := pv - 0.618 * rng
+        r3 := pv + rng
+        s3 := pv - rng
+    else if formula == "Woodie"
+        pv := (prevHi + prevLo + 2.0 * open) / 4.0
+        r1 := 2.0 * pv - prevLo
+        s1 := 2.0 * pv - prevHi
+        r2 := pv + rng
+        s2 := pv - rng
+        r3 := prevHi + 2.0 * (pv - prevLo)
+        s3 := prevLo - 2.0 * (prevHi - pv)
+    else if formula == "Classic"
+        r1 := 2.0 * pv - prevLo
+        s1 := 2.0 * pv - prevHi
+        r2 := pv + rng
+        s2 := pv - rng
+        r3 := pv + 2.0 * rng
+        s3 := pv - 2.0 * rng
+    else if formula == "DM"
+        dmX = prevCl < prevOp ? prevHi + 2.0 * prevLo + prevCl : prevCl > prevOp ? 2.0 * prevHi + prevLo + prevCl : prevHi + prevLo + 2.0 * prevCl
+        pv := dmX / 4.0
+        r1 := dmX / 2.0 - prevLo
+        s1 := dmX / 2.0 - prevHi
+    else
+        r1 := prevCl + rng * 1.1 / 12.0
+        s1 := prevCl - rng * 1.1 / 12.0
+        r2 := prevCl + rng * 1.1 / 6.0
+        s2 := prevCl - rng * 1.1 / 6.0
+        r3 := prevCl + rng * 1.1 / 4.0
+        s3 := prevCl - rng * 1.1 / 4.0
+    emit("P", pv, bar_index, #F59E0B)
+    emit("R1", r1, bar_index, #F59E0B)
+    emit("S1", s1, bar_index, #F59E0B)
+    emit("R2", r2, bar_index, #F59E0B)
+    emit("S2", s2, bar_index, #F59E0B)
+    emit("R3", r3, bar_index, #F59E0B)
+    emit("S3", s3, bar_index, #F59E0B)
+    while array.size(segLines) > keepPeriods * 7
+        line.delete(array.shift(segLines))
+    while array.size(segLabels) > keepPeriods * 7
+        label.delete(array.shift(segLabels))
+else if array.size(segLines) > 0
+    for idx = 0 to array.size(segLines) - 1
+        ln = array.get(segLines, idx)
+        if line.get_x1(ln) == segStart
+            line.set_x2(ln, bar_index)

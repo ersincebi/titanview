@@ -1,0 +1,35 @@
+name: Bug report
+description: Something does not work or differs from expected behaviour
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you expect, and what did you see instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: "1. Open BTCUSDT 15m\n2. Add …\n3. …"
+    validations:
+      required: true
+  - type: textarea
+    id: script
+    attributes:
+      label: TitanScript code (if relevant)
+      description: Paste the script and expected vs actual values for the same symbol/interval/bar.
+      render: text
+  - type: input
+    id: version
+    attributes:
+      label: Version and platform
+      placeholder: "v1.0.0, macOS 15 arm64 / Windows 11 / Ubuntu 24.04 / browser"
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or screenshots

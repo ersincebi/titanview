@@ -1,0 +1,19 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr 52 Haftalık Yüksek/Düşük
+// @category other
+// @desc Son 52 haftanın en yüksek ve en düşük seviyesi
+indicator("52 Week High/Low", "52W H/L", overlay=true)
+showLabels = input.bool(true, "Show labels")
+lookback = timeframe.isdaily ? 252 : timeframe.isweekly ? 52 : timeframe.ismonthly ? 12 : math.max(1, math.round(52 * 7 * 86400 / timeframe.in_seconds()))
+hh = ta.highest(high, math.min(lookback, 5000))
+ll = ta.lowest(low, math.min(lookback, 5000))
+plot(hh, "52W High", color=#089981, style=plot.style_stepline)
+plot(ll, "52W Low", color=#F23645, style=plot.style_stepline)
+var label lh = na
+var label lo = na
+if barstate.islast and showLabels
+    label.delete(lh)
+    label.delete(lo)
+    lh := label.new(bar_index, hh, "52W H " + str.tostring(hh, format.mintick), style=label.style_label_left, color=color.new(#089981, 20), textcolor=color.white, size=size.small)
+    lo := label.new(bar_index, ll, "52W L " + str.tostring(ll, format.mintick), style=label.style_label_left, color=color.new(#F23645, 20), textcolor=color.white, size=size.small)

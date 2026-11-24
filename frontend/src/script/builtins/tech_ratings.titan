@@ -1,0 +1,31 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Teknik Derecelendirme
+// @category other
+// @desc Ortalama ve osilatör bileşik oylaması (−1..1)
+indicator("Technical Ratings", "Tech Ratings", overlay=false, format=format.price, precision=2)
+voteMa(float m) => na(m) ? na : close > m ? 1.0 : close < m ? -1.0 : 0.0
+maVotes = array.from(voteMa(ta.sma(close, 10)), voteMa(ta.sma(close, 20)), voteMa(ta.sma(close, 30)), voteMa(ta.sma(close, 50)), voteMa(ta.sma(close, 100)), voteMa(ta.sma(close, 200)), voteMa(ta.ema(close, 10)), voteMa(ta.ema(close, 20)), voteMa(ta.ema(close, 30)), voteMa(ta.ema(close, 50)), voteMa(ta.ema(close, 100)), voteMa(ta.ema(close, 200)), voteMa(ta.vwma(close, 20)), voteMa(ta.hma(close, 9)))
+r14 = ta.rsi(close, 14)
+sk = ta.sma(ta.stoch(close, high, low, 14), 3)
+sd = ta.sma(sk, 3)
+c20 = ta.cci(close, 20)
+[dp, dm, adx] = ta.dmi(14, 14)
+aoVal = ta.sma(hl2, 5) - ta.sma(hl2, 34)
+m10 = ta.mom(close, 10)
+[mL, sL, _] = ta.macd(close, 12, 26, 9)
+w14 = ta.wpr(14)
+bp = close - math.min(low, close[1])
+trU = math.max(high, close[1]) - math.min(low, close[1])
+uoVal = 100.0 * (4.0 * math.sum(bp, 7) / math.sum(trU, 7) + 2.0 * math.sum(bp, 14) / math.sum(trU, 14) + math.sum(bp, 28) / math.sum(trU, 28)) / 7.0
+oscVotes = array.from(r14 < 30 and r14 > r14[1] ? 1.0 : r14 > 70 and r14 < r14[1] ? -1.0 : 0.0, sk < 20 and sd < 20 and sk > sd ? 1.0 : sk > 80 and sd > 80 and sk < sd ? -1.0 : 0.0, c20 < -100 and c20 > c20[1] ? 1.0 : c20 > 100 and c20 < c20[1] ? -1.0 : 0.0, adx > 20 and dp > dm ? 1.0 : adx > 20 and dp < dm ? -1.0 : 0.0, aoVal > 0 and aoVal > aoVal[1] ? 1.0 : aoVal < 0 and aoVal < aoVal[1] ? -1.0 : 0.0, m10 > m10[1] ? 1.0 : m10 < m10[1] ? -1.0 : 0.0, mL > sL ? 1.0 : mL < sL ? -1.0 : 0.0, w14 < -80 and w14 > w14[1] ? 1.0 : w14 > -20 and w14 < w14[1] ? -1.0 : 0.0, uoVal > 70 ? 1.0 : uoVal < 30 ? -1.0 : 0.0)
+maScore = array.avg(maVotes)
+oscScore = array.avg(oscVotes)
+composite = (maScore + oscScore) / 2.0
+barCol = composite > 0.5 ? #089981 : composite > 0.1 ? #22C55E : composite < -0.5 ? #F23645 : composite < -0.1 ? #FB7185 : #64748B
+plot(composite, "Rating", style=plot.style_columns, color=barCol)
+plot(maScore, "MAs Rating", color=#0284C7, display=display.none)
+plot(oscScore, "Oscillators Rating", color=#F59E0B, display=display.none)
+hline(0.5, "Strong Buy", color=color.new(#089981, 50), linestyle=hline.style_dashed)
+hline(0.0, "Neutral", color=#64748B)
+hline(-0.5, "Strong Sell", color=color.new(#F23645, 50), linestyle=hline.style_dashed)

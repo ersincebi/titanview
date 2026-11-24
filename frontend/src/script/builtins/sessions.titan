@@ -1,0 +1,17 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Seanslar
+// @category other
+// @desc Asya, Londra, New York seanslarını arka planda gösterir (UTC)
+indicator("Sessions", "Sessions", overlay=true)
+showAsia = input.bool(true, "Asia", inline="a")
+asiaSess = input.session("0000-0900", "", inline="a")
+showLondon = input.bool(true, "London", inline="l")
+londonSess = input.session("0700-1600", "", inline="l")
+showNY = input.bool(true, "New York", inline="n")
+nySess = input.session("1300-2200", "", inline="n")
+inSess(string s) => not na(time(timeframe.period, s, "UTC"))
+bgcolor(timeframe.isintraday and showAsia and inSess(asiaSess) ? color.new(#FF9800, 92) : na, title="Asia")
+bgcolor(timeframe.isintraday and showLondon and inSess(londonSess) ? color.new(#0284C7, 92) : na, title="London")
+bgcolor(timeframe.isintraday and showNY and inSess(nySess) ? color.new(#089981, 92) : na, title="New York")
+plot(timeframe.isintraday ? na : close, "Close (non-intraday)", display=display.none)

@@ -1,0 +1,12 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Tüm Zamanların En Yüksek/En Düşük
+// @category other
+// @desc Yüklenen verideki en yüksek ve en düşük seviye
+indicator("All Time High/Low", "ATH/ATL", overlay=true)
+var float ath = na
+var float atl = na
+ath := na(ath) ? high : math.max(ath, high)
+atl := na(atl) ? low : math.min(atl, low)
+plot(ath, "ATH", color=#089981, style=plot.style_stepline)
+plot(atl, "ATL", color=#F23645, style=plot.style_stepline)

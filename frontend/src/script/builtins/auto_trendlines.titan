@@ -1,0 +1,38 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Otomatik Trend Çizgileri
+// @category auto
+// @desc Son iki tepe ve iki dibi birleştiren trend çizgileri
+indicator("Auto Trendlines", "Auto TL", overlay=true, max_lines_count=4)
+depth = input.int(10, "Pivot Length", minval=2)
+extendIt = input.bool(true, "Extend")
+var float h1 = na
+var int hb1 = na
+var float h2 = na
+var int hb2 = na
+var float l1 = na
+var int lb1 = na
+var float l2 = na
+var int lb2 = na
+ph = ta.pivothigh(high, depth, depth)
+pl = ta.pivotlow(low, depth, depth)
+if not na(ph)
+    h1 := h2
+    hb1 := hb2
+    h2 := ph
+    hb2 := bar_index - depth
+if not na(pl)
+    l1 := l2
+    lb1 := lb2
+    l2 := pl
+    lb2 := bar_index - depth
+var line res = na
+var line sup = na
+if barstate.islast
+    line.delete(res)
+    line.delete(sup)
+    ext = extendIt ? extend.right : extend.none
+    if not na(h1)
+        res := line.new(hb1, h1, hb2, h2, color=#F23645, width=2, extend=ext)
+    if not na(l1)
+        sup := line.new(lb1, l1, lb2, l2, color=#089981, width=2, extend=ext)

@@ -1,0 +1,23 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Hacim Akış Göstergesi
+// @category volume
+// @desc Katkılı hacim akışı (VFI benzeri)
+indicator("Volume Flow Indicator", "VFI", overlay=false)
+length = input.int(130, "Length", minval=1)
+coef = input.float(0.2, "Coef")
+vcoef = input.float(2.5, "Max Volume Cutoff")
+smooth = input.int(3, "Signal", minval=1)
+typical = hlc3
+inter = math.log(typical) - math.log(typical[1])
+vinter = ta.stdev(inter, 30)
+cutoff = coef * vinter * close
+vave = ta.sma(volume, length)[1]
+vmax = vave * vcoef
+vc = math.min(volume, vmax)
+mf = typical - typical[1]
+vcp = mf > cutoff ? vc : mf < -cutoff ? -vc : 0
+vfi = ta.sma(math.sum(vcp, length) / vave, 3)
+plot(vfi, "VFI", color=#0284C7)
+plot(ta.ema(vfi, smooth), "Signal", color=#FF6D00)
+hline(0, "Zero", color=#787B86)

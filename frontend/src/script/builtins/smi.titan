@@ -1,0 +1,22 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Stokastik Momentum Endeksi
+// @category osc
+// @desc Kapanışın aralık ortasına uzaklığı (−100..100)
+indicator("Stochastic Momentum Index", "SMI", overlay=false, format=format.price, precision=2)
+kLen = input.int(10, "%K Length", minval=1)
+dLen = input.int(3, "%D Length", minval=1)
+sigLen = input.int(3, "EMA Length", minval=1)
+hiN = ta.highest(high, kLen)
+loN = ta.lowest(low, kLen)
+span = hiN - loN
+dist = close - (hiN + loN) / 2.0
+num = ta.ema(ta.ema(dist, dLen), dLen)
+den = ta.ema(ta.ema(span, dLen), dLen)
+smiVal = 200.0 * (num / den)
+plot(smiVal, "SMI", color=#0284C7)
+plot(ta.ema(smiVal, sigLen), "SMI-based EMA", color=#F59E0B)
+hiLine = hline(40, "Overbought", color=#64748B)
+hline(0, "Middle", color=color.new(#64748B, 50))
+loLine = hline(-40, "Oversold", color=#64748B)
+fill(hiLine, loLine, color=color.new(#0284C7, 90), title="Background")

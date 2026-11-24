@@ -1,0 +1,7 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Williams Birikim/Dağılım
+// @category volume
+// @desc Gerçek aralık tabanlı birikim
+indicator("Williams Accumulation/Distribution", "WAD", overlay=false)
+plot(ta.wad, "WAD", color=#0284C7)

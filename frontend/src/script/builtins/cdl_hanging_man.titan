@@ -1,0 +1,20 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Asılı Adam
+// @category pattern
+// @desc Mum formasyonu — ayı (düşüş) sinyali (HM)
+indicator("Hanging Man", "HM", overlay=true)
+trendMode = input.string("SMA50", "Detect Trend Based On", options=["SMA50", "SMA50, SMA200", "No detection"])
+sma50 = ta.sma(close, 50)
+sma200 = ta.sma(close, 200)
+inUptrend = trendMode == "No detection" ? true : trendMode == "SMA50" ? close > sma50 : close > sma50 and sma50 > sma200
+bodyTop = math.max(open, close)
+bodyBot = math.min(open, close)
+bodySize = bodyTop - bodyBot
+barRange = high - low
+upperWick = high - bodyTop
+lowerWick = bodyBot - low
+avgBody = ta.ema(bodySize, 14)
+isSmall = bodySize < avgBody
+detected = inUptrend and isSmall and bodySize > 0 and lowerWick >= bodySize * 2.0 and upperWick <= barRange * 0.05
+plotshape(detected, "Hanging Man", style=shape.labeldown, location=location.abovebar, color=color.new(#F23645, 0), text="HM", textcolor=color.white, size=size.small)

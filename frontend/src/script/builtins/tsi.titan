@@ -1,0 +1,16 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Gerçek Güç Endeksi
+// @category osc
+// @desc Çift düzleştirilmiş momentum oranı
+indicator("True Strength Index", "TSI", overlay=false, format=format.price, precision=4)
+slowLen = input.int(25, "Long Length", minval=1)
+fastLen = input.int(13, "Short Length", minval=1)
+sigLen = input.int(13, "Signal Length", minval=1)
+chg = close - close[1]
+num = ta.ema(ta.ema(chg, slowLen), fastLen)
+den = ta.ema(ta.ema(math.abs(chg), slowLen), fastLen)
+tsiVal = 100.0 * num / den
+plot(tsiVal, "True Strength Index", color=#0284C7)
+plot(ta.ema(tsiVal, sigLen), "Signal", color=#E11D48)
+hline(0, "Zero", color=#64748B)

@@ -1,0 +1,9 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.titanview_desktop" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/titan_accent</item>
+        <item name="colorAccent">@color/titan_accent</item>
+        <item name="android:windowBackground">@color/titan_canvas</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+</resources>

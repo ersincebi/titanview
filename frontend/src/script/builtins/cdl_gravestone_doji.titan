@@ -1,0 +1,15 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Mezar Taşı Doji
+// @category pattern
+// @desc Mum formasyonu — ayı (düşüş) sinyali (GD)
+indicator("Gravestone Doji", "GD", overlay=true)
+bodyTop = math.max(open, close)
+bodyBot = math.min(open, close)
+bodySize = bodyTop - bodyBot
+barRange = high - low
+upperWick = high - bodyTop
+lowerWick = bodyBot - low
+isDojiBody = barRange > 0 and bodySize <= barRange * 0.05
+detected = isDojiBody and lowerWick <= barRange * 0.05 and upperWick >= barRange * 0.6
+plotshape(detected, "Gravestone Doji", style=shape.labeldown, location=location.abovebar, color=color.new(#F23645, 0), text="GD", textcolor=color.white, size=size.small)

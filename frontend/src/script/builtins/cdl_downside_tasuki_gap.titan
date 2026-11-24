@@ -1,0 +1,16 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Aşağı Tasuki Boşluğu
+// @category pattern
+// @desc Mum formasyonu — ayı (düşüş) sinyali (DTG)
+indicator("Downside Tasuki Gap", "DTG", overlay=true)
+trendMode = input.string("SMA50", "Detect Trend Based On", options=["SMA50", "SMA50, SMA200", "No detection"])
+sma50 = ta.sma(close, 50)
+sma200 = ta.sma(close, 200)
+inDowntrend = trendMode == "No detection" ? true : trendMode == "SMA50" ? close < sma50 : close < sma50 and sma50 < sma200
+bodyTop = math.max(open, close)
+bodyBot = math.min(open, close)
+isBull = close > open
+isBear = close < open
+detected = inDowntrend[2] and isBear[2] and isBear[1] and bodyTop[1] < bodyBot[2] and isBull and open <= bodyTop[1] and open >= bodyBot[1] and close > bodyTop[1] and close < bodyBot[2]
+plotshape(detected, "Downside Tasuki Gap", style=shape.labeldown, location=location.abovebar, color=color.new(#F23645, 0), text="DTG", textcolor=color.white, size=size.small)

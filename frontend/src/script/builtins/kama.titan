@@ -1,0 +1,19 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Kaufman Uyarlamalı Hareketli Ortalama
+// @category ma
+// @desc Verimlilik oranına göre hız ayarlı ortalama
+indicator("Kaufman Adaptive Moving Average", "KAMA", overlay=true)
+length = input.int(10, "Length", minval=1)
+fastLength = input.int(2, "Fast EMA Length")
+slowLength = input.int(30, "Slow EMA Length")
+src = input(close, "Source")
+mom = math.abs(ta.change(src, length))
+volatility = math.sum(math.abs(ta.change(src)), length)
+er = volatility != 0 ? mom / volatility : 0
+fastAlpha = 2 / (fastLength + 1)
+slowAlpha = 2 / (slowLength + 1)
+alpha = math.pow(er * (fastAlpha - slowAlpha) + slowAlpha, 2)
+kama = 0.0
+kama := na(kama[1]) ? src : alpha * src + (1 - alpha) * kama[1]
+plot(kama, "KAMA", color=#6d1e7f, linewidth=2)

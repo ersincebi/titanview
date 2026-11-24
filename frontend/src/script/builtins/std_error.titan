@@ -1,0 +1,12 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Standart Hata
+// @category volatility
+// @desc Regresyon tahmininin standart hatası
+indicator("Standard Error", "StdErr", overlay=false)
+length = input.int(21, "Length", minval=3)
+src = input(close, "Source")
+lr = ta.linreg(src, length, 0)
+err = src - lr
+se = math.sqrt(math.sum(err * err, length) / (length - 2))
+plot(se, "Standard Error", color=#0284C7)

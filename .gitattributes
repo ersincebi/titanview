@@ -1,0 +1,5 @@
+# Windows checkout'ta CRLF'ye çevrilmesin: tazelik özetleri (build-wasm/build-script-server --check) bayt bayt karşılaştırır.
+* text=auto eol=lf
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf

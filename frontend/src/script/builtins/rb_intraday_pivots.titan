@@ -1,0 +1,27 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Gün İçi Klasik Pivotlar
+// @category other
+// @desc Önceki günün pivot ve destek/direnç seviyeleri
+indicator("Intraday Floor Pivots", "Day Pivots", overlay=true)
+var float curHi = na
+var float curLo = na
+var float prevHi = na
+var float prevLo = na
+var float prevCl = na
+if timeframe.change("D")
+    prevHi := curHi
+    prevLo := curLo
+    prevCl := close[1]
+    curHi := high
+    curLo := low
+else
+    curHi := na(curHi) ? high : math.max(curHi, high)
+    curLo := na(curLo) ? low : math.min(curLo, low)
+pv = (prevHi + prevLo + prevCl) / 3.0
+rng = prevHi - prevLo
+plot(pv, "PP", color=#F59E0B, style=plot.style_stepline)
+plot(2.0 * pv - prevLo, "R1", color=#F23645, style=plot.style_stepline)
+plot(2.0 * pv - prevHi, "S1", color=#089981, style=plot.style_stepline)
+plot(pv + rng, "R2", color=#F23645, style=plot.style_stepline)
+plot(pv - rng, "S2", color=#089981, style=plot.style_stepline)

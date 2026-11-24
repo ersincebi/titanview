@@ -1,0 +1,12 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr MACD + Stokastik Dönüş
+// @category other
+// @desc MACD + stokastik dönüş sinyalleri
+indicator("MACD Stochastic Reversal", "MACD-Stoch", overlay=true)
+[macdLine, _, _] = ta.macd(close, 12, 26, 9)
+stochVal = ta.stoch(close, high, low, 70)
+longSig = macdLine > macdLine[1] and macdLine[1] < macdLine[2] and stochVal < 30
+shortSig = macdLine < macdLine[1] and macdLine[1] > macdLine[2] and stochVal > 70
+plotshape(longSig, "Buy", style=shape.triangleup, location=location.belowbar, color=#089981, size=size.small)
+plotshape(shortSig, "Sell", style=shape.triangledown, location=location.abovebar, color=#F23645, size=size.small)

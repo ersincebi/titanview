@@ -1,0 +1,12 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Müthiş Osilatör
+// @category osc
+// @desc SMA(hl2,5) − SMA(hl2,34)
+indicator("Awesome Oscillator", "AO", overlay=false)
+mid = (high + low) / 2
+osc = ta.sma(mid, 5) - ta.sma(mid, 34)
+rising = osc > osc[1]
+plot(osc, "AO", style=plot.style_columns, color=rising ? #089981 : #F23645)
+alertcondition(rising and not rising[1], title="AO Turned Bullish", message="AO momentum turned upward")
+alertcondition(not rising and rising[1], title="AO Turned Bearish", message="AO momentum turned downward")

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="titan_accent">#FF0284C7</color>
+    <color name="titan_canvas">#FF0B0E14</color>
+    <color name="titan_panel">#FF111622</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+</resources>

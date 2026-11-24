@@ -1,0 +1,20 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Yükselen Üç Yöntem
+// @category pattern
+// @desc Mum formasyonu — boğa (yükseliş) sinyali (R3M)
+indicator("Rising Three Methods", "R3M", overlay=true)
+trendMode = input.string("SMA50", "Detect Trend Based On", options=["SMA50", "SMA50, SMA200", "No detection"])
+sma50 = ta.sma(close, 50)
+sma200 = ta.sma(close, 200)
+inUptrend = trendMode == "No detection" ? true : trendMode == "SMA50" ? close > sma50 : close > sma50 and sma50 > sma200
+bodyTop = math.max(open, close)
+bodyBot = math.min(open, close)
+bodySize = bodyTop - bodyBot
+avgBody = ta.ema(bodySize, 14)
+isSmall = bodySize < avgBody
+isLong = bodySize > avgBody
+isBull = close > open
+isBear = close < open
+detected = inUptrend[4] and isBull[4] and isLong[4] and isBear[3] and isSmall[3] and isBear[2] and isSmall[2] and isBear[1] and isSmall[1] and high[3] <= high[4] and low[3] >= low[4] and high[2] <= high[4] and low[2] >= low[4] and high[1] <= high[4] and low[1] >= low[4] and isBull and isLong and close > close[4]
+plotshape(detected, "Rising Three Methods", style=shape.labelup, location=location.belowbar, color=color.new(#089981, 0), text="R3M", textcolor=color.white, size=size.small)

@@ -1,0 +1,21 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Woodies CCI
+// @category osc
+// @desc CCI turbo ve trend histogramı
+indicator("Woodies CCI", "Woodies CCI", overlay=false)
+turboLen = input.int(6, "CCI Turbo Length", minval=3, maxval=14)
+mainLen = input.int(14, "CCI 14 Length", minval=7, maxval=20)
+turbo = ta.cci(close, turboLen)
+main = ta.cci(close, mainLen)
+var int aboveCnt = 0
+var int belowCnt = 0
+aboveCnt := main > 0 ? aboveCnt + 1 : 0
+belowCnt := main < 0 ? belowCnt + 1 : 0
+histCol = aboveCnt > 5 ? #089981 : belowCnt > 5 ? #F23645 : main < 0 ? #089981 : #F23645
+plot(main, "CCI Histogram", style=plot.style_columns, color=histCol)
+plot(turbo, "CCI Turbo", color=#089981, linewidth=2)
+plot(main, "CCI 14", color=#8B5CF6, linewidth=2)
+hline(0, "Zero Line", color=#64748B, linestyle=hline.style_dashed)
+hline(100, "Hundred Line", color=#64748B, linestyle=hline.style_dashed)
+hline(-100, "Minus Line", color=#64748B, linestyle=hline.style_dashed)

@@ -1,0 +1,51 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Otomatik Fib Uzatma
+// @category auto
+// @desc Son üç pivota göre trend bazlı Fibonacci uzatması
+indicator("Auto Fib Extension", "Auto Fib Ext", overlay=true, max_lines_count=50, max_labels_count=50)
+depth = input.int(10, "Depth", minval=2)
+showPrices = input.bool(true, "Show Prices")
+var array<float> pp = array.new<float>()
+var array<int> pb = array.new<int>()
+var array<bool> pk = array.new<bool>()
+push(float price, int bar, bool isHigh) =>
+    n = array.size(pp)
+    if n > 0 and array.get(pk, n - 1) == isHigh
+        last = array.get(pp, n - 1)
+        if (isHigh and price > last) or (not isHigh and price < last)
+            array.set(pp, n - 1, price)
+            array.set(pb, n - 1, bar)
+    else
+        array.push(pp, price)
+        array.push(pb, bar)
+        array.push(pk, isHigh)
+        if array.size(pp) > 3
+            array.shift(pp)
+            array.shift(pb)
+            array.shift(pk)
+ph = ta.pivothigh(high, depth, depth)
+pl = ta.pivotlow(low, depth, depth)
+if not na(ph)
+    push(ph, bar_index - depth, true)
+if not na(pl)
+    push(pl, bar_index - depth, false)
+var array<line> ls = array.new<line>()
+var array<label> lb = array.new<label>()
+if barstate.islast and array.size(pp) == 3
+    for l in ls
+        line.delete(l)
+    for x in lb
+        label.delete(x)
+    array.clear(ls)
+    array.clear(lb)
+    a = array.get(pp, 0)
+    b = array.get(pp, 1)
+    c = array.get(pp, 2)
+    array.push(ls, line.new(array.get(pb, 0), a, array.get(pb, 1), b, color=color.new(#787B86, 30), style=line.style_dashed))
+    array.push(ls, line.new(array.get(pb, 1), b, array.get(pb, 2), c, color=color.new(#787B86, 30), style=line.style_dashed))
+    levels = array.from(0.0, 0.382, 0.618, 1.0, 1.618, 2.618)
+    for lv in levels
+        price = c + (b - a) * lv
+        array.push(ls, line.new(array.get(pb, 2), price, bar_index, price, color=#0284C7, extend=extend.right))
+        array.push(lb, label.new(array.get(pb, 2), price, str.tostring(lv) + (showPrices ? " (" + str.tostring(price, format.mintick) + ")" : ""), style=label.style_none, textcolor=#0284C7, size=size.small))

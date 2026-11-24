@@ -1,0 +1,11 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Tarihsel Volatilite
+// @category volatility
+// @desc Logaritmik getirilerin yıllıklandırılmış std sapması
+indicator("Historical Volatility", "HV", overlay=false, format=format.price, precision=2)
+period = input.int(10, "Length", minval=2)
+logRet = math.log(close / close[1])
+barsPerYear = timeframe.isweekly ? 52.0 : timeframe.ismonthly ? 12.0 : 365.0
+annVol = 100.0 * ta.stdev(logRet, period) * math.sqrt(barsPerYear)
+plot(annVol, "HV", color=#0284C7)

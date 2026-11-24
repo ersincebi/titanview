@@ -1,0 +1,72 @@
+/* Faz 19 — Betik editörü (Monaco), betik kütüphanesi, sürüm geçmişi, referans kılavuzu */
+.script-code-host { flex: 1; min-height: 0; display: flex; position: relative; }
+.script-code-host > .script-textarea { flex: 1; }
+.script-monaco { flex: 1; min-height: 0; width: 100%; }
+.script-monaco .script-err-line { background: rgba(242, 54, 69, 0.12); }
+.script-monaco .script-err-glyph { background: #f23645; border-radius: 50%; width: 8px !important; height: 8px !important; margin: 6px 0 0 6px; }
+
+.script-diagnostics { list-style: none; margin: 0; padding: 2px 6px 4px; max-height: 72px; overflow-y: auto; font-size: 11px; }
+.script-diagnostics button { all: unset; cursor: pointer; color: var(--bear); display: block; width: 100%; padding: 1px 2px; border-radius: 3px; }
+.script-diagnostics button:hover { background: var(--bg-hover, rgba(255, 255, 255, 0.05)); }
+.script-diag-loc { font-family: var(--font-code); opacity: 0.8; margin-right: 6px; }
+
+.script-doc-name { font-size: 12px; font-weight: 600; color: var(--text-primary); max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; }
+.script-dirty { color: #ff9800; font-size: 10px; }
+
+.script-lib-tabs { display: flex; gap: 2px; padding: 0 12px; border-bottom: 1px solid var(--border-color); }
+.script-lib-tab { all: unset; cursor: pointer; padding: 8px 10px; font-size: 13px; color: var(--text-secondary); border-bottom: 2px solid transparent; }
+.script-lib-tab.active { color: var(--text-primary); border-bottom-color: var(--accent, #0284c7); }
+.script-lib, .script-ref, .script-versions, .script-saveas { padding: 10px 12px; }
+.script-lib-search { width: 100%; box-sizing: border-box; padding: 6px 8px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-canvas); color: var(--text-primary); font-size: 13px; }
+.script-lib-list { margin-top: 8px; max-height: 52vh; overflow-y: auto; }
+.script-lib-row { display: flex; align-items: center; gap: 8px; padding: 4px 6px; border-radius: 6px; }
+.script-lib-row:hover, .script-lib-row.active { background: var(--bg-hover, rgba(255, 255, 255, 0.05)); }
+.script-lib-name { all: unset; cursor: pointer; flex: 1; font-size: 13px; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.script-lib-rename { flex: 1; font-size: 13px; padding: 2px 6px; background: var(--bg-canvas); color: var(--text-primary); border: 1px solid var(--accent, #0284c7); border-radius: 4px; }
+.script-lib-kind, .script-lib-time { font-size: 11px; color: var(--text-secondary); white-space: nowrap; }
+.script-lib-row .icon-text-btn { all: unset; cursor: pointer; font-size: 12px; padding: 2px 6px; border-radius: 4px; color: var(--text-secondary); }
+.script-lib-row .icon-text-btn:hover { color: var(--text-primary); }
+.script-lib-row .icon-text-btn.danger { color: #fff; background: var(--bear); }
+.script-lib-empty { padding: 16px 4px; color: var(--text-secondary); font-size: 13px; }
+.script-lib-error { margin-top: 6px; color: var(--bear); font-size: 12px; }
+
+.script-versions { display: grid; grid-template-columns: 220px 1fr; gap: 10px; height: 56vh; }
+.script-versions-list { overflow-y: auto; border-right: 1px solid var(--border-color); padding-right: 6px; }
+.script-version-row { all: unset; cursor: pointer; display: grid; grid-template-columns: 1fr auto; gap: 2px 6px; width: 100%; box-sizing: border-box; padding: 6px; border-radius: 6px; font-size: 12px; }
+.script-version-row.active, .script-version-row:hover { background: var(--bg-hover, rgba(255, 255, 255, 0.05)); }
+.script-version-no { font-weight: 600; color: var(--text-primary); }
+.script-version-time { grid-column: 1; color: var(--text-secondary); font-size: 11px; }
+.script-version-diff { grid-column: 2; grid-row: 1 / span 2; align-self: center; font-family: var(--font-code); font-size: 11px; }
+.script-version-preview { display: flex; flex-direction: column; min-height: 0; }
+.script-version-bar { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; }
+.script-version-code { flex: 1; margin: 0; overflow: auto; background: var(--bg-canvas); border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; font-family: var(--font-code); font-size: 12px; white-space: pre; color: var(--text-primary); }
+
+.script-ref-body { display: grid; grid-template-columns: 240px 1fr; gap: 10px; margin-top: 8px; height: 52vh; }
+.script-ref-list { overflow-y: auto; border-right: 1px solid var(--border-color); padding-right: 6px; }
+.script-ref-row { all: unset; cursor: pointer; display: block; width: 100%; box-sizing: border-box; padding: 3px 6px; border-radius: 4px; font-family: var(--font-code); font-size: 12px; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.script-ref-row.active, .script-ref-row:hover { background: var(--bg-hover, rgba(255, 255, 255, 0.05)); }
+.script-ref-doc { overflow-y: auto; font-size: 13px; color: var(--text-primary); }
+.script-ref-sig { display: block; font-family: var(--font-code); font-size: 12px; background: var(--bg-canvas); border: 1px solid var(--border-color); border-radius: 6px; padding: 8px; white-space: pre-wrap; word-break: break-word; }
+.script-ref-kind { margin-top: 6px; font-size: 11px; color: var(--text-secondary); }
+.script-ref-params-title { font-weight: 600; margin-top: 8px; }
+.script-ref-params { margin: 4px 0 10px; padding-left: 18px; }
+
+.script-saveas label { display: flex; flex-direction: column; gap: 6px; font-size: 12px; color: var(--text-secondary); }
+.script-saveas-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px; }
+
+@media (max-width: 820px) {
+  .script-versions, .script-ref-body { grid-template-columns: 1fr; height: auto; }
+  .script-versions-list, .script-ref-list { max-height: 28vh; border-right: none; border-bottom: 1px solid var(--border-color); }
+  .script-doc-name { max-width: 110px; }
+}
+
+/* Araç çubuğu: sekmeler sıkışmaz; TitanScript kontrolleri dar ekranda yatay kayar */
+.workbench-header .wb-tabs { flex: 0 1 auto; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+.workbench-header .wb-tabs::-webkit-scrollbar { display: none; }
+.workbench-header .wb-tabs > * { flex-shrink: 0; }
+.workbench-header .wb-controls { flex: 0 1 auto; min-width: min(55%, 560px); justify-content: flex-end; margin-left: 8px; }
+.workbench-header .wb-script-controls { min-width: 0; overflow-x: auto; scrollbar-width: none; }
+.workbench-header .wb-script-controls::-webkit-scrollbar { display: none; }
+.workbench-header .wb-script-controls > * { flex-shrink: 0; }
+.workbench-header .wb-script-controls .script-select { max-width: 170px; }
+.workbench-header .wb-script-controls button { white-space: nowrap; }

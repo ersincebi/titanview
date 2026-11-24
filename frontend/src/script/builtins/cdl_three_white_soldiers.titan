@@ -1,0 +1,16 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Üç Beyaz Asker
+// @category pattern
+// @desc Mum formasyonu — boğa (yükseliş) sinyali (3WS)
+indicator("Three White Soldiers", "3WS", overlay=true)
+bodyTop = math.max(open, close)
+bodyBot = math.min(open, close)
+bodySize = bodyTop - bodyBot
+barRange = high - low
+upperWick = high - bodyTop
+avgBody = ta.ema(bodySize, 14)
+isLong = bodySize > avgBody
+isBull = close > open
+detected = isBull and isBull[1] and isBull[2] and isLong and isLong[1] and isLong[2] and close > close[1] and close[1] > close[2] and open > open[1] and open < close[1] and open[1] > open[2] and open[1] < close[2] and upperWick <= barRange * 0.25 and upperWick[1] <= barRange[1] * 0.25 and upperWick[2] <= barRange[2] * 0.25
+plotshape(detected, "Three White Soldiers", style=shape.labelup, location=location.belowbar, color=color.new(#089981, 0), text="3WS", textcolor=color.white, size=size.small)

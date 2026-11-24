@@ -1,0 +1,13 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Coppock Eğrisi
+// @category osc
+// @desc İki ROC toplamının WMA'sı
+indicator("Coppock Curve", "Coppock Curve", overlay=false, format=format.price, precision=2)
+wmaPeriod = input.int(10, "WMA Length", minval=1)
+longRoc = input.int(14, "Long RoC Length", minval=1)
+shortRoc = input.int(11, "Short RoC Length", minval=1)
+rocSum = ta.roc(close, longRoc) + ta.roc(close, shortRoc)
+coppockVal = ta.wma(rocSum, wmaPeriod)
+plot(coppockVal, "Coppock Curve", color=#0284C7)
+hline(0, "Baseline", color=#64748B)

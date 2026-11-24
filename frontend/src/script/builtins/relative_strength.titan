@@ -1,0 +1,13 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Göreli Güç (Karşılaştırmalı)
+// @category other
+// @desc Fiyatın başka bir sembole oranı ve ortalaması
+indicator("Relative Strength", "RS", overlay=false, format=format.price, precision=4)
+symbolInput = input.symbol("XU100.IS", "Comparative Symbol")
+length = input.int(50, "MA Length", minval=1)
+other = request.security(symbolInput, timeframe.period, close)
+rs = close / other
+plot(rs, "RS", color=#0284C7)
+plot(ta.sma(rs, length), "RS MA", color=#FF6D00)
+hline(0, "Zero", color=color.new(#787B86, 100))

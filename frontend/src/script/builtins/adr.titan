@@ -1,0 +1,9 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Ortalama Gün Aralığı
+// @category volatility
+// @desc Günlük yüksek-düşük farkının ortalaması
+indicator("Average Day Range", "ADR", overlay=false)
+lengthInput = input.int(14, title="Length")
+adr = ta.sma(high - low, lengthInput)
+plot(adr, title="ADR", color=#0284C7)

@@ -1,0 +1,52 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Zig Zag
+// @category auto
+// @desc Sapma yüzdesine göre tepe-dip bağlantıları
+indicator("Zig Zag", "ZigZag", overlay=true, max_lines_count=500, max_labels_count=500)
+minDevPct = input.float(5.0, "Price deviation for reversals (%)", minval=0.00001, maxval=100.0, step=0.5)
+pivotBars = input.int(10, "Pivot legs", minval=2)
+segCol = input.color(#0284C7, "Line color")
+drawTail = input.bool(true, "Extend to last bar")
+showPx = input.bool(true, "Display reversal price")
+showPct = input.bool(true, "Display percent change")
+var float curPx = na
+var int curIdx = na
+var bool curTop = false
+var line curSeg = na
+var label curTag = na
+var line liveSeg = na
+topP = ta.pivothigh(high, pivotBars, pivotBars)
+botP = ta.pivotlow(low, pivotBars, pivotBars)
+recordPivot(float px, int idx, bool isTop) =>
+    float unused = na
+    if na(curPx)
+        curPx := px
+        curIdx := idx
+        curTop := isTop
+    else if isTop == curTop
+        if (isTop and px > curPx) or (not isTop and px < curPx)
+            if not na(curSeg)
+                line.set_xy2(curSeg, idx, px)
+                label.set_xy(curTag, idx, px)
+                label.set_text(curTag, str.tostring(px, format.mintick))
+            curPx := px
+            curIdx := idx
+    else
+        movePct = math.abs(px - curPx) / curPx * 100.0
+        if movePct >= minDevPct
+            curSeg := line.new(curIdx, curPx, idx, px, color=segCol, width=2)
+            signedPct = (px - curPx) / curPx * 100.0
+            lbl = (showPx ? str.tostring(px, format.mintick) : "") + (showPct ? " (" + str.tostring(signedPct, "#.##") + "%)" : "")
+            curTag := label.new(idx, px, lbl, style=isTop ? label.style_label_down : label.style_label_up, color=color.new(color.white, 100), textcolor=segCol, size=size.small)
+            curPx := px
+            curIdx := idx
+            curTop := isTop
+    unused
+if not na(topP)
+    recordPivot(topP, bar_index - pivotBars, true)
+if not na(botP)
+    recordPivot(botP, bar_index - pivotBars, false)
+if barstate.islast and drawTail and not na(curPx)
+    line.delete(liveSeg)
+    liveSeg := line.new(curIdx, curPx, bar_index, close, color=segCol, style=line.style_dashed)

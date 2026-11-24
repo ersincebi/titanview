@@ -1,0 +1,26 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Schaff Trend Döngüsü
+// @category osc
+// @desc MACD üzerinde çift stokastik
+indicator("Schaff Trend Cycle", "STC", overlay=false, format=format.price, precision=2)
+fastLen = input.int(23, "Fast Length", minval=1)
+slowLen = input.int(50, "Slow Length", minval=1)
+cycleLen = input.int(10, "Cycle Length", minval=1)
+d1 = input.float(0.5, "Factor", step=0.1)
+macd = ta.ema(close, fastLen) - ta.ema(close, slowLen)
+lo1 = ta.lowest(macd, cycleLen)
+hi1 = ta.highest(macd, cycleLen) - lo1
+f1 = 0.0
+f1 := hi1 > 0 ? (macd - lo1) / hi1 * 100 : nz(f1[1])
+pf = 0.0
+pf := na(pf[1]) ? f1 : pf[1] + d1 * (f1 - pf[1])
+lo2 = ta.lowest(pf, cycleLen)
+hi2 = ta.highest(pf, cycleLen) - lo2
+f2 = 0.0
+f2 := hi2 > 0 ? (pf - lo2) / hi2 * 100 : nz(f2[1])
+stc = 0.0
+stc := na(stc[1]) ? f2 : stc[1] + d1 * (f2 - stc[1])
+plot(stc, "STC", color=#0284C7)
+hline(75, "Upper", color=#787B86, linestyle=hline.style_dashed)
+hline(25, "Lower", color=#787B86, linestyle=hline.style_dashed)

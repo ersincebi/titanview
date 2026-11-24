@@ -1,0 +1,15 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Momentum-RSI Iraksaması
+// @category other
+// @desc Momentum−fiyat ıraksamasını RSI aşırılığıyla işaretler
+indicator("Momentum RSI Divergence", "Mom-RSI Div", overlay=true)
+scanLen = input.int(150, "Bars to check", minval=10)
+rsiLen = input.int(21, "RSI Period", minval=1)
+momLen = input.int(20, "Momentum Period", minval=1)
+rsiVal = ta.rsi(close, rsiLen)
+momVal = ta.mom(close, momLen)
+bearSig = high >= ta.highest(high, 20) and momVal < ta.highest(momVal, 20) and ta.highest(rsiVal, scanLen) > 70
+bullSig = low <= ta.lowest(low, 20) and momVal > ta.lowest(momVal, 20) and ta.lowest(rsiVal, scanLen) < 30
+plotshape(bearSig and not bearSig[1], "Bearish Div", style=shape.labeldown, location=location.abovebar, color=#F23645, text="DIV", textcolor=color.white)
+plotshape(bullSig and not bullSig[1], "Bullish Div", style=shape.labelup, location=location.belowbar, color=#089981, text="DIV", textcolor=color.white)

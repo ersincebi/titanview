@@ -1,0 +1,12 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Chaikin Osilatörü
+// @category osc
+// @desc A/D çizgisinin iki EMA farkı
+indicator("Chaikin Oscillator", "Chaikin Osc", overlay=false, format=format.volume)
+fastLen = input.int(3, "Fast Length", minval=1)
+slowLen = input.int(10, "Slow Length", minval=1)
+adlLine = ta.accdist
+chaikinVal = ta.ema(adlLine, fastLen) - ta.ema(adlLine, slowLen)
+plot(chaikinVal, "Chaikin Oscillator", color=#EC4899)
+hline(0, "Zero Line", color=#64748B)

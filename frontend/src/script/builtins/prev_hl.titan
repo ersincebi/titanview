@@ -1,0 +1,25 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Önceki Dönem Yüksek/Düşük
+// @category other
+// @desc Önceki gün/hafta/ay yüksek, düşük ve kapanış
+indicator("Previous High/Low", "Prev H/L", overlay=true)
+tf = input.timeframe("D", "Timeframe")
+showClose = input.bool(true, "Show close")
+var float curH = na
+var float curL = na
+var float prevH = na
+var float prevL = na
+var float prevC = na
+if timeframe.change(tf)
+    prevH := curH
+    prevL := curL
+    prevC := close[1]
+    curH := high
+    curL := low
+else
+    curH := na(curH) ? high : math.max(curH, high)
+    curL := na(curL) ? low : math.min(curL, low)
+plot(prevH, "Previous High", color=#089981, style=plot.style_stepline)
+plot(prevL, "Previous Low", color=#F23645, style=plot.style_stepline)
+plot(showClose ? prevC : na, "Previous Close", color=#787B86, style=plot.style_stepline)

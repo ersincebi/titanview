@@ -1,0 +1,11 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Dikey Yatay Filtre
+// @category trend
+// @desc Trend/yatay piyasa ayrımı
+indicator("Vertical Horizontal Filter", "VHF", overlay=false, format=format.price, precision=4)
+length = input.int(28, "Length", minval=1)
+hcp = ta.highest(close, length)
+lcp = ta.lowest(close, length)
+vhf = (hcp - lcp) / math.sum(math.abs(ta.change(close)), length)
+plot(vhf, "VHF", color=#0284C7)

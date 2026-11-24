@@ -1,0 +1,20 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Stokastik RSI
+// @category osc
+// @desc RSI üzerine stokastik
+indicator("Stochastic RSI", "Stoch RSI", overlay=false, format=format.price, precision=2)
+kSmooth = input.int(3, "K", minval=1)
+dSmooth = input.int(3, "D", minval=1)
+rsiPeriod = input.int(14, "RSI Length", minval=1)
+stochPeriod = input.int(14, "Stochastic Length", minval=1)
+price = input.source(close, "RSI Source")
+rsiSeries = ta.rsi(price, rsiPeriod)
+kLine = ta.sma(ta.stoch(rsiSeries, rsiSeries, rsiSeries, stochPeriod), kSmooth)
+dLine = ta.sma(kLine, dSmooth)
+plot(kLine, "K", color=#0284C7)
+plot(dLine, "D", color=#F59E0B)
+hiLine = hline(80, "Upper Band", color=#64748B)
+hline(50, "Middle Band", color=color.new(#64748B, 50))
+loLine = hline(20, "Lower Band", color=#64748B)
+fill(hiLine, loLine, color=color.new(#0284C7, 90), title="Background")

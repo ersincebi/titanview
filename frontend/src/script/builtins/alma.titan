@@ -1,0 +1,11 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Arnaud Legoux Hareketli Ortalama
+// @category ma
+// @desc Gauss ağırlıklı ortalama
+indicator("Arnaud Legoux Moving Average", "ALMA", overlay=true)
+price = input.source(close, "Source")
+win = input.int(9, "Window Size", minval=1)
+shift = input.float(0.85, "Offset", step=0.01)
+sig = input.float(6.0, "Sigma", minval=0.01)
+plot(ta.alma(price, win, shift, sig), "ALMA", color=#0284C7)

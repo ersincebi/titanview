@@ -1,0 +1,21 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Terk Edilmiş Bebek Ayı
+// @category pattern
+// @desc Mum formasyonu — ayı (düşüş) sinyali (AB)
+indicator("Abandoned Baby - Bearish", "AB", overlay=true)
+trendMode = input.string("SMA50", "Detect Trend Based On", options=["SMA50", "SMA50, SMA200", "No detection"])
+sma50 = ta.sma(close, 50)
+sma200 = ta.sma(close, 200)
+inUptrend = trendMode == "No detection" ? true : trendMode == "SMA50" ? close > sma50 : close > sma50 and sma50 > sma200
+bodyTop = math.max(open, close)
+bodyBot = math.min(open, close)
+bodySize = bodyTop - bodyBot
+barRange = high - low
+avgBody = ta.ema(bodySize, 14)
+isLong = bodySize > avgBody
+isBull = close > open
+isBear = close < open
+isDojiBody = barRange > 0 and bodySize <= barRange * 0.05
+detected = inUptrend[2] and isBull[2] and isLong[2] and isDojiBody[1] and low[1] > high[2] and isBear and isLong and high < low[1]
+plotshape(detected, "Abandoned Baby - Bearish", style=shape.labeldown, location=location.abovebar, color=color.new(#F23645, 0), text="AB", textcolor=color.white, size=size.small)

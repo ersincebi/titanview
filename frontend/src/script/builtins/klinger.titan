@@ -1,0 +1,14 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Klinger Osilatörü
+// @category volume
+// @desc Hacim kuvvetinin hızlı/yavaş EMA farkı
+indicator("Klinger Oscillator", "KVO", overlay=false, format=format.volume)
+fastLen = input.int(34, "Fast Length", minval=1)
+slowLen = input.int(55, "Slow Length", minval=1)
+sigLen = input.int(13, "Signal Length", minval=1)
+signedVol = (high + low + close) >= (high[1] + low[1] + close[1]) ? volume : -volume
+kvoVal = ta.ema(signedVol, fastLen) - ta.ema(signedVol, slowLen)
+sigVal = ta.ema(kvoVal, sigLen)
+plot(kvoVal, "Klinger Oscillator", color=#0284C7)
+plot(sigVal, "Signal", color=#16A34A)

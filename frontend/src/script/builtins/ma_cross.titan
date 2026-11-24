@@ -1,0 +1,13 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Hareketli Ortalama Kesişimi
+// @category ma
+// @desc Kısa ve uzun SMA kesişimi
+indicator("MA Cross", "MA Cross", overlay=true)
+fastLen = input.int(9, "Short MA Length", minval=1)
+slowLen = input.int(21, "Long MA Length", minval=1)
+fastMa = ta.sma(close, fastLen)
+slowMa = ta.sma(close, slowLen)
+plot(fastMa, "Short", color=#F59E0B)
+plot(slowMa, "Long", color=#16A34A)
+plot(ta.cross(fastMa, slowMa) ? fastMa : na, "Cross", color=#0284C7, style=plot.style_cross, linewidth=4)

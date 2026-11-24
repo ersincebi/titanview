@@ -1,0 +1,17 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Ay Evreleri
+// @category other
+// @desc Yeni ay ve dolunay işaretleri (astronomik hesap)
+indicator("Moon Phases", "Moon", overlay=true)
+synodic = 29.530588853 * 86400000.0
+ref = 947182440000.0
+phase(t) =>
+    p = ((t - ref) % synodic) / synodic
+    p < 0 ? p + 1 : p
+cur = phase(time)
+prev = phase(time[1])
+newMoon = cur < prev
+fullMoon = prev < 0.5 and cur >= 0.5
+plotshape(newMoon, "New Moon", style=shape.circle, location=location.abovebar, color=#787B86, size=size.small)
+plotshape(fullMoon, "Full Moon", style=shape.circle, location=location.belowbar, color=#FFEB3B, size=size.small)

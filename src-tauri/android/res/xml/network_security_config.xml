@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Yerel mod: Go çekirdeği 127.0.0.1 üzerinde düz HTTP. Uzak sunucu modu:
+     kullanıcının seçtiği ev sunucusu (LAN, çoğunlukla http). Arayüz, yerel
+     olmayan http adreslerinde uyarı gösterir; https önerilir. -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="true">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>

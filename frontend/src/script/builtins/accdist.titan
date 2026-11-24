@@ -1,0 +1,10 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Birikim/Dağılım
+// @category volume
+// @desc Kapanış konumu × hacim kümülatifi
+indicator("Accumulation/Distribution", "Accum/Dist", overlay=false, format=format.volume)
+span = high - low
+clv = span == 0 ? 0.0 : ((close - low) - (high - close)) / span
+adl = ta.cum(clv * volume)
+plot(adl, "Accumulation/Distribution", color=#0284C7)

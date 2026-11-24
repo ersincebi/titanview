@@ -1,0 +1,21 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr Ichimoku Bulutu
+// @category trend
+// @desc Tenkan, Kijun, Senkou A/B, Chikou
+indicator("Ichimoku Cloud", "Ichimoku", overlay=true)
+tenkanLen = input.int(9, "Conversion Line Length", minval=1)
+kijunLen = input.int(26, "Base Line Length", minval=1)
+senkouBLen = input.int(52, "Leading Span B Length", minval=1)
+shiftBars = input.int(26, "Lagging Span", minval=1)
+midHL(int n) => (ta.highest(high, n) + ta.lowest(low, n)) / 2.0
+tenkan = midHL(tenkanLen)
+kijun = midHL(kijunLen)
+spanA = (tenkan + kijun) / 2.0
+spanB = midHL(senkouBLen)
+plot(tenkan, "Conversion Line", color=#0284C7)
+plot(kijun, "Base Line", color=#DC2626)
+plot(close, "Lagging Span", offset=-(shiftBars - 1), color=#16A34A)
+aPlot = plot(spanA, "Leading Span A", offset=shiftBars - 1, color=#22C55E)
+bPlot = plot(spanB, "Leading Span B", offset=shiftBars - 1, color=#EF4444)
+fill(aPlot, bPlot, color=spanA >= spanB ? color.new(#22C55E, 88) : color.new(#EF4444, 88), title="Kumo Cloud")

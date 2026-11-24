@@ -1,0 +1,6 @@
+/target/
+/gen/schemas
+/binaries/titanview-server-*
+/gen/android
+/gen/apple
+/binaries/android

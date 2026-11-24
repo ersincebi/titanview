@@ -1,0 +1,10 @@
+//@version=6
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// @tr McGinley Dinamik
+// @category ma
+// @desc Hıza uyarlanan ortalama
+indicator("McGinley Dynamic", "McGinley", overlay=true)
+period = input.int(14, "Length", minval=1)
+var float dyn = na
+dyn := na(dyn[1]) ? ta.ema(close, period) : dyn[1] + (close - dyn[1]) / (period * math.pow(close / dyn[1], 4))
+plot(dyn, "McGinley Dynamic", color=#0284C7)
