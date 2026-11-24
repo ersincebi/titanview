@@ -1,9 +1,9 @@
 cask "titanview" do
   arch arm: "aarch64", intel: "x64"
 
-  version "1.0.0"
-  sha256 arm:   "ec46ef390ea3828fd12a8ed096491a091db7cb9fba83b675773d1d5adf8f5e21",
-         intel: "aea237928a2d2dc3abf552d8594fe20098b12babf2ff0b5ad1dbbe380aa20928"
+  version "1.0.1"
+  sha256 arm:   "8b5828b590837501d828641f8dad6798340a80af3f3a7dc66465aa3a55c46de8",
+         intel: "8aae446c740de8c36c647639028406439cd0d81972eb47ea7efb530740fc0ae1"
 
   url "https://github.com/ersincebi/titanview/releases/download/v#{version}/TitanView_#{version}_#{arch}.dmg"
   name "TitanView"
