@@ -2,6 +2,9 @@ name: ci
 on:
   push:
   pull_request:
+env:
+  # Avoid transient proxy.golang.org HTTP/2 stream INTERNAL_ERROR resets on GitHub runners.
+  GODEBUG: http2client=0
 jobs:
   backend:
     runs-on: ubuntu-latest
@@ -10,6 +13,7 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
       - run: cd backend && go vet ./... && go test -race -cover ./...
       - name: fuzz (kısa)
         run: |
@@ -45,6 +49,7 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
       - uses: dtolnay/rust-toolchain@stable
       - run: pnpm install --frozen-lockfile
       - name: Install go-licenses
@@ -64,6 +69,7 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
