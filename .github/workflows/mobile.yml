@@ -9,6 +9,11 @@ on:
   release:
     types: [published]
   workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to attach the built APK to (optional, e.g. v1.0.0)"
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -61,7 +66,7 @@ jobs:
       - name: Android projesi (tauri android init + TitanView ayarları)
         run: node scripts/android-init.mjs
 
-      - name: Debug APK (universal: arm64-v8a + x86_64)
+      - name: Debug APK (universal, arm64-v8a + x86_64)
         run: pnpm tauri android build --debug --apk --target aarch64 x86_64
 
       - name: Release APK (imzalı, arm64-v8a + x86_64)
@@ -108,13 +113,15 @@ jobs:
           if-no-files-found: warn
 
       - name: Sürüme ekle (imzalı release APK)
-        if: github.event_name == 'release' && env.ANDROID_KEYSTORE_BASE64 != ''
+        if: (github.event_name == 'release' || inputs.tag != '') && env.ANDROID_KEYSTORE_BASE64 != ''
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload "${{ github.event.release.tag_name }}" out/TitanView-*-release.apk out/SHA256SUMS-android.txt --clobber
+          REL_TAG: ${{ github.event.release.tag_name || inputs.tag }}
+        run: gh release upload "$REL_TAG" out/TitanView-*-release.apk out/SHA256SUMS-android.txt --clobber
 
       - name: Sürüme ekle (universal debug APK, imza sırrı yoksa)
-        if: github.event_name == 'release' && env.ANDROID_KEYSTORE_BASE64 == ''
+        if: (github.event_name == 'release' || inputs.tag != '') && env.ANDROID_KEYSTORE_BASE64 == ''
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload "${{ github.event.release.tag_name }}" out/TitanView-universal-debug.apk out/SHA256SUMS-android.txt --clobber
+          REL_TAG: ${{ github.event.release.tag_name || inputs.tag }}
+        run: gh release upload "$REL_TAG" out/TitanView-universal-debug.apk out/SHA256SUMS-android.txt --clobber
