@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.2 — 2026-11-24
+
+### Fixed
+- "Check for updates" no longer fails with "Could not fetch a valid release JSON": releases now ship a signed
+  `latest.json`, so 1.0.1 and later update in place. If the signed manifest is ever missing, the app compares itself
+  with the latest GitHub release and offers the download page instead of an error.
+
 ## 1.0.1 — 2026-11-24
 
 ### Fixed
