@@ -74,6 +74,8 @@ import { getChartBySlot, getOverlayBySlot, rt } from './runtime';
 import { DEFAULT_INDICATORS, TEMPLATES, type TemplateKey, templateFlags } from './templates';
 import { candleChangePct } from './reports';
 import { applyQuote, type MarketFilter, type WatchlistTab } from './watchlist';
+import { needsResolve, resolveSymbol, resolvedInfo } from './symbolResolve';
+import { repairBareWatchlistSymbols } from './watchlistStore';
 import { favoriteFor, loadFavorites, mergeFavorites, saveFavorites, toggleFavorite, type Favorite } from './favorites';
 import { isMobileWidth } from './mobile';
 import {
@@ -668,6 +670,8 @@ export async function switchSymbol(
   interval?: Timeframe,
   opts: { fromTab?: boolean; targetSlot?: number } = {}
 ): Promise<void> {
+  // Yalın ve katalogda olmayan kod (ör. EUREN) önce borsasına çözülür (EUREN.IS); yoksa ABD hissesi sanılıyordu.
+  if (needsResolve(symbol, symbols())) symbol = await resolveSymbol(symbol, symbols());
   const sym = symbol.toUpperCase();
   const target = opts.targetSlot ?? ui.activeSlot;
   const curSym = slotSymbolAt(target);
@@ -2725,7 +2729,12 @@ export async function bootstrap(): Promise<void> {
   }
   clearHistory();
   startWorkspaceAutosave();
-  void restoreFavorites();
+  void restoreFavorites().then(() => repairBareFavorites()).then(() => repairBareWatchlistSymbols(symbols()))
+    .then(async () => {
+      // Kayıtlı çalışma alanı yalın bir kodda açıldıysa (EUREN) grafiği de doğru borsaya taşı.
+      if (needsResolve(ui.symbol, symbols()) && (await resolveSymbol(ui.symbol, symbols())) !== ui.symbol.toUpperCase()) await switchSymbol(ui.symbol, ui.interval);
+    })
+    .catch(() => undefined);
   void refreshSavedScripts();
   void layoutsRefreshHook?.();
   await Promise.all([loadSymbolData(ui.symbol, ui.interval), refreshWatchlist(), refreshScreener('ALL')]);
@@ -2786,10 +2795,40 @@ export function toggleFav(item: Favorite): void {
   void refreshQuotes();
 }
 
-/** Yalnız sembol adıyla favori aç/kapat (üst çubuk ☆, arama, komutlar). */
-export function toggleFavSymbol(symbol: string): void {
+/** Yalnız sembol adıyla favori aç/kapat (üst çubuk ☆, arama, komutlar). Yalın kod önce borsasına çözülür. */
+export async function toggleFavSymbol(symbol: string): Promise<void> {
   if (!symbol.trim()) return;
-  toggleFav(favoriteFor(symbol, symbols()));
+  const sym = needsResolve(symbol, symbols()) ? await resolveSymbol(symbol, symbols()) : symbol;
+  const info = resolvedInfo(symbol);
+  toggleFav(info && info.symbol === sym ? info : favoriteFor(sym, symbols()));
+}
+
+/**
+ * v1.0.1 öncesi yalın kodla eklenmiş favorileri onarır: "EUREN" (ABD sanılan) → "EUREN.IS" (BIST).
+ * Yalnız katalogda olmayan, yalın ve ABD olarak işaretli kayıtlara dokunur.
+ */
+export async function repairBareFavorites(): Promise<number> {
+  const list = favorites();
+  let changed = 0;
+  const next: Favorite[] = [];
+  for (const f of list) {
+    if (f.market === 'US' && needsResolve(f.symbol, symbols())) {
+      const sym = await resolveSymbol(f.symbol, symbols());
+      const info = resolvedInfo(f.symbol);
+      if (sym !== f.symbol.toUpperCase() && !next.some((n) => n.symbol === sym) && !list.some((o) => o.symbol.toUpperCase() === sym)) {
+        next.push(info ? { ...info } : favoriteFor(sym, symbols()));
+        changed++;
+        continue;
+      }
+    }
+    next.push(f);
+  }
+  if (changed) {
+    setFavorites(next);
+    saveFavorites(next);
+    void syncFavoritesToServer();
+  }
+  return changed;
 }
 
 /**

@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.3 — 2026-11-24
+
+### Fixed
+- Borsa Istanbul stocks that are not in the built-in list (e.g. EUREN, ASGYO, ANSGR) were treated as US stocks when
+  typed without the `.IS` suffix, so data failed with "yahoo finance status 404". Bare codes are now resolved to their
+  exchange through symbol search (EUREN → EUREN.IS) when opening a chart, adding a favorite or adding to a watchlist.
+- Favorites, watchlists and the last opened chart saved with such bare codes are repaired automatically on startup.
+
 ## 1.0.2 — 2026-11-24
 
 ### Fixed

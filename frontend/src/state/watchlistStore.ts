@@ -23,6 +23,8 @@ import {
   type WatchlistSortCol,
   type WatchlistSortState,
 } from './watchlist';
+import { needsResolve, resolveSymbol } from './symbolResolve';
+import type { SymbolQuoteSummary } from '../types/market';
 
 const LS_COLS_KEY = 'tv_wl_columns_v27'; // gitleaks:allow (localStorage key name, not a secret)
 const LS_ACTIVE_WL_KEY = 'tv_wl_active_v27';
@@ -326,15 +328,45 @@ export async function removeWatchlist(id: string): Promise<boolean> {
   return true;
 }
 
-export async function addSymbolToWatchlist(rawSymbol: string, listId?: string): Promise<void> {
-  const sym = rawSymbol.trim().toUpperCase();
+export async function addSymbolToWatchlist(rawSymbol: string, listId?: string, known: SymbolQuoteSummary[] = []): Promise<void> {
+  let sym = rawSymbol.trim().toUpperCase();
   if (!sym) return;
+  // Yalın kod (ör. EUREN) borsasına çözülür (EUREN.IS); yoksa ABD hissesi sanılıp veri alınamıyordu.
+  if (needsResolve(sym, known)) sym = await resolveSymbol(sym, known);
   const wl = (listId ? watchlists().find((w) => w.id === listId) : null) ?? activeWatchlist();
   if (wl.items.some((it) => it.type === 'symbol' && it.symbol?.toUpperCase() === sym)) {
     return;
   }
   const items: WatchlistEntry[] = [...wl.items, { type: 'symbol', symbol: sym }];
   await saveAndReplaceWatchlist({ ...wl, items });
+}
+
+/**
+ * Daha önce yalın kodla eklenmiş satırları onarır (EUREN → EUREN.IS). Katalogdakilere dokunmaz.
+ * Döner: değişen satır sayısı.
+ */
+export async function repairBareWatchlistSymbols(known: SymbolQuoteSummary[]): Promise<number> {
+  let total = 0;
+  for (const wl of watchlists()) {
+    let changed = 0;
+    const items: WatchlistEntry[] = [];
+    for (const it of wl.items) {
+      if (it.type === 'symbol' && it.symbol && needsResolve(it.symbol, known)) {
+        const sym = await resolveSymbol(it.symbol, known);
+        if (sym !== it.symbol.toUpperCase() && !wl.items.some((o) => o.type === 'symbol' && o.symbol?.toUpperCase() === sym)) {
+          items.push({ ...it, symbol: sym });
+          changed++;
+          continue;
+        }
+      }
+      items.push(it);
+    }
+    if (changed) {
+      total += changed;
+      await saveAndReplaceWatchlist({ ...wl, items });
+    }
+  }
+  return total;
 }
 
 export async function removeSymbolFromWatchlist(symbol: string, listId?: string): Promise<void> {

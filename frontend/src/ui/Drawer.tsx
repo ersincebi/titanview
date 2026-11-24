@@ -535,7 +535,7 @@ function WatchlistPanel(): JSX.Element {
       selectCustomWatchlist(activeWatchlist().id);
       for (const part of val.split(',')) {
         const norm = normalizeImportedSymbol(part);
-        if (norm) await addSymbolToWatchlist(norm);
+        if (norm) await addSymbolToWatchlist(norm, undefined, symbols());
       }
     } else if (mode === 'section') {
       selectCustomWatchlist(activeWatchlist().id);

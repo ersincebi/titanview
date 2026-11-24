@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { describe, expect, it, beforeEach } from 'vitest';
+import { describe, expect, it, beforeEach, vi } from 'vitest';
 import { favoriteFor, inferMarket } from '../../state/favorites';
 import { favorites, setFavorites, toggleFavSymbol } from '../../state/store';
 
@@ -31,5 +31,31 @@ describe('symbol favorites from anywhere (search, top bar)', () => {
     expect(favorites().map((f) => f.symbol)).toEqual(['ASELS.IS']);
     toggleFavSymbol('  ');
     expect(favorites()).toHaveLength(1);
+  });
+});
+
+describe('repairing favorites added as bare codes', () => {
+  it('moves EUREN (wrongly US) to EUREN.IS (BIST) and leaves catalog symbols alone', async () => {
+    const client = await import('../../api/client');
+    const spy = vi.spyOn(client, 'fetchSymbols').mockImplementation(async (_m, q) =>
+      String(q).toUpperCase() === 'EUREN'
+        ? ([{ symbol: 'EUREN.IS', displayName: 'Europen Endustri', market: 'BIST', lastPrice: null }] as never)
+        : ([{ symbol: String(q).toUpperCase(), displayName: `${q} (US Equity)`, market: 'US', lastPrice: null }] as never),
+    );
+    const { repairBareFavorites } = await import('../../state/store');
+    const { clearResolveCache } = await import('../../state/symbolResolve');
+    clearResolveCache();
+    setFavorites([
+      { symbol: 'EUREN', displayName: 'EUREN', market: 'US' },
+      { symbol: 'PGSUS.IS', displayName: 'Pegasus', market: 'BIST' },
+      { symbol: 'ZZZZ', displayName: 'ZZZZ', market: 'US' },
+    ]);
+    expect(await repairBareFavorites()).toBe(1);
+    expect(favorites()).toEqual([
+      { symbol: 'EUREN.IS', displayName: 'Europen Endustri', market: 'BIST' },
+      { symbol: 'PGSUS.IS', displayName: 'Pegasus', market: 'BIST' },
+      { symbol: 'ZZZZ', displayName: 'ZZZZ', market: 'US' },
+    ]);
+    spy.mockRestore();
   });
 });
