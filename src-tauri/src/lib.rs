@@ -115,6 +115,84 @@ fn stop_sidecar(app: &AppHandle) {
     }
 }
 
+/// Sürüm dizgesini (ör. "v1.0.1", "1.2.0-beta.1") sayısal parçalara çevirir; ön sürüm eki atılır.
+pub fn parse_version(v: &str) -> Vec<u64> {
+    let core = v.trim().trim_start_matches(['v', 'V']).split(['-', '+']).next().unwrap_or("");
+    core.split('.').map(|p| p.parse::<u64>().unwrap_or(0)).collect()
+}
+
+/// `latest`, `current`'tan yeni mi?
+pub fn is_newer(latest: &str, current: &str) -> bool {
+    let (mut a, mut b) = (parse_version(latest), parse_version(current));
+    let n = a.len().max(b.len());
+    a.resize(n, 0);
+    b.resize(n, 0);
+    a > b
+}
+
+#[cfg(desktop)]
+const RELEASES_API: &str = "https://api.github.com/repos/ersincebi/titanview/releases/latest";
+#[cfg(desktop)]
+const RELEASES_PAGE: &str = "https://github.com/ersincebi/titanview/releases/latest";
+
+#[cfg(desktop)]
+async fn latest_release() -> Result<(String, String), String> {
+    #[derive(serde::Deserialize)]
+    struct Rel {
+        tag_name: String,
+        html_url: String,
+    }
+    let client = reqwest::Client::builder()
+        .user_agent(concat!("TitanView/", env!("CARGO_PKG_VERSION")))
+        .timeout(Duration::from_secs(15))
+        .build()
+        .map_err(|e| e.to_string())?;
+    let resp = client.get(RELEASES_API).header("Accept", "application/vnd.github+json").send().await.map_err(|e| e.to_string())?;
+    if !resp.status().is_success() {
+        return Err(format!("GitHub HTTP {}", resp.status()));
+    }
+    let r: Rel = resp.json().await.map_err(|e| e.to_string())?;
+    Ok((r.tag_name, r.html_url))
+}
+
+/// İmzalı latest.json yoksa (güncelleme anahtarı olmadan derlenen sürümler) GitHub'daki son
+/// sürümle karşılaştırır ve indirme sayfasını önerir.
+#[cfg(desktop)]
+async fn github_fallback(app: &AppHandle, current: &str, interactive: bool) {
+    match latest_release().await {
+        Ok((tag, url)) if is_newer(&tag, current) => {
+            app_log(app, &format!("yeni sürüm (GitHub): {current} → {tag}"));
+            let url = if url.starts_with("https://github.com/") { url } else { RELEASES_PAGE.to_string() };
+            let h = app.clone();
+            app.dialog()
+                .message(format!("TitanView {tag} yayımlandı (kurulu: {current}).\nİndirme sayfası açılsın mı?"))
+                .title("Güncelleme")
+                .buttons(MessageDialogButtons::OkCancelCustom("İndirme sayfasını aç".into(), "Sonra".into()))
+                .show(move |ok| {
+                    if ok {
+                        let _ = h.opener().open_url(url, None::<&str>);
+                    }
+                });
+        }
+        Ok(_) => {
+            app_log(app, &format!("güncelleme yok (sürüm {current}, GitHub)"));
+            if interactive {
+                app.dialog().message(format!("TitanView güncel (sürüm {current}).")).title("Güncelleme").show(|_| {});
+            }
+        }
+        Err(e) => {
+            app_log(app, &format!("GitHub sürüm denetimi başarısız: {e}"));
+            if interactive {
+                app.dialog()
+                    .message(format!("Güncelleme denetlenemedi. İnternet bağlantını kontrol et.\n({e})"))
+                    .kind(MessageDialogKind::Warning)
+                    .title("Güncelleme")
+                    .show(|_| {});
+            }
+        }
+    }
+}
+
 #[cfg(desktop)]
 /// Güncelleme denetimi. `interactive`: tepsiden istendi (sonuç her durumda gösterilir).
 /// `TITAN_UPDATE_AUTO_INSTALL=1`: sormadan kur (kanıt/CI için).
@@ -144,10 +222,10 @@ async fn check_update(app: AppHandle, interactive: bool) {
             return;
         }
         Err(e) => {
-            app_log(&app, &format!("güncelleme denetimi başarısız: {e}"));
-            if interactive {
-                app.dialog().message(format!("Güncelleme denetlenemedi: {e}")).kind(MessageDialogKind::Error).title("Güncelleme").show(|_| {});
-            }
+            // İmzalı latest.json yayımlanmamış olabilir (güncelleme anahtarı olmadan derlenen sürümler).
+            // O zaman GitHub'daki son sürümle karşılaştırıp indirme sayfasını öneririz.
+            app_log(&app, &format!("imzalı güncelleme denetimi başarısız ({e}); GitHub sürümlerine bakılıyor"));
+            github_fallback(&app, &current, interactive).await;
             return;
         }
     };
@@ -418,6 +496,12 @@ mod tests {
         assert!(s.contains(r#""base":"http://127.0.0.1:5""#));
         assert!(s.contains(r#""token":"t\"k""#));
         assert!(s.contains("Object.freeze"));
+        assert!(super::is_newer("v1.0.1", "1.0.0"));
+        assert!(super::is_newer("v1.1", "1.0.9"));
+        assert!(!super::is_newer("v1.0.1", "1.0.1"));
+        assert!(!super::is_newer("v1.0.0", "1.0.1"));
+        assert!(!super::is_newer("v1.0.1-beta.1", "1.0.1"));
+        assert_eq!(super::parse_version("V2.10.3+build"), vec![2, 10, 3]);
         assert!(s.contains(&format!(r#""platform":"{}""#, platform())));
     }
 

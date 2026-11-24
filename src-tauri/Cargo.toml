@@ -31,6 +31,8 @@ tauri-plugin-global-shortcut = "2"
 tauri-plugin-updater = "2"
 tauri-plugin-process = "2"
 tauri-plugin-single-instance = "2"
+# Güncelleme denetimi yedeği: imzalı latest.json yoksa GitHub sürüm API'si (TLS updater ile ortak).
+reqwest = { version = "0.13", default-features = false, features = ["json"] }
 
 [profile.release]
 codegen-units = 1

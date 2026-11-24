@@ -4600,6 +4600,7 @@ version = "1.0.1"
 dependencies = [
  "getrandom 0.2.17",
  "log",
+ "reqwest",
  "serde",
  "serde_json",
  "tauri",
